@@ -1,7 +1,6 @@
 package com.uvs.coffeejob.test;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,9 +21,9 @@ public class UserTest {
         user.setName(DEFAULT_NAME);
         user.setSurname(DEFAULT_SURNAME);
         user.setBio(DEFAULT_BIO);
-        assertThat(user.getName(), equalTo(DEFAULT_NAME));
-        assertThat(user.getSurname(), equalTo(DEFAULT_SURNAME));
-        assertThat(user.getBio(), equalTo(DEFAULT_BIO));
+        assertEquals(DEFAULT_NAME, user.getName());
+        assertEquals(DEFAULT_SURNAME, user.getSurname());
+        assertEquals(DEFAULT_BIO, user.getBio());
     }
 }
 
