@@ -11,7 +11,6 @@ import android.widget.TextView;
 
 import com.uvs.coffeejob.MainActivity;
 import com.uvs.coffeejob.R;
-import com.uvs.coffeejob.User;
 
 @RunWith(RobolectricTestRunner.class)
 public class MainActivityTest {
@@ -48,4 +47,3 @@ public class MainActivityTest {
 		assertEquals(DEFAULT_CONTACTS, mUserContacts.getText().toString());
 	}
 }
-
