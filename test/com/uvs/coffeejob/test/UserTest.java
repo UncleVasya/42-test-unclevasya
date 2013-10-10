@@ -17,7 +17,7 @@ public class UserTest {
 	final String DEFAULT_SURNAME = "Ovcharenko";
 	final String DEFAULT_BIO     = "Nothing interesting here. " + 
                                    "Just a man from Belogorsk.";
-	final GregorianCalendar DEFAULT_BIRTH = new GregorianCalendar(1991, 01, 01);
+	final GregorianCalendar DEFAULT_BIRTH = new GregorianCalendar(1991, 00, 01);
     
 	@Test
     public void test_UserSetters() {
@@ -49,6 +49,7 @@ public class UserTest {
         UserContact contact = new UserContact(CONTACT_2_TYPE, CONTACT_2_VALUE);
         user.addContact(contact);
         assertEquals(2, user.getContacts().size());
+        
         
         assertEquals(new UserContact(CONTACT_1_TYPE, CONTACT_1_VALUE),  
                      user.getContacts().get(0));

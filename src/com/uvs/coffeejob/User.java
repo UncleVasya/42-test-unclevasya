@@ -13,15 +13,15 @@ public class User {
     private List<UserContact> mContacts = new ArrayList<UserContact>();
 	
     public void addContact(UserContact contact) {
-    	
+    	mContacts.add(contact);
     }
     
     public void addContact(String type, String value) {
-    	
+    	mContacts.add(new UserContact(type, value));
     }
     
     public void clearContacts() {
-    	
+    	mContacts.clear();
     }
 	
 	// setters
@@ -38,7 +38,7 @@ public class User {
 	}
 	
 	public void setBirthDate(GregorianCalendar date) {
-		
+		mBirthDate = date;
 	}
 	
 	
