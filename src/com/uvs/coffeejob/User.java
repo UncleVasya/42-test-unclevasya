@@ -19,15 +19,15 @@ public class User {
 	}
 	
 	// getters
-	String getName() {
+	public String getName() {
 		return mName;
 	}
 	
-	String getSurname() {
+	public String getSurname() {
 		return mSurname;
 	}
 	
-	String getBio() {
+	public String getBio() {
 		return mBio;
 	}
 }
