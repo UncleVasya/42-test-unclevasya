@@ -7,12 +7,15 @@ public class User {
 	
 	// setters
 	public void setName(String name) {
+		mName = name;
 	}
 	
 	public void setSurname(String surname) {
+		mSurname = surname;
 	}
 	
 	public void setBio(String bio) {
+		mBio = bio;
 	}
 	
 	// getters
