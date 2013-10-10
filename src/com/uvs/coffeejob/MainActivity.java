@@ -10,7 +10,7 @@ public class MainActivity extends Activity {
 	private TextView mUserBio;
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		mUserName = (TextView)findViewById(R.id.userNameText);
