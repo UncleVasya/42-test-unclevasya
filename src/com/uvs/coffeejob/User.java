@@ -23,6 +23,16 @@ public class User {
     public void clearContacts() {
     	mContacts.clear();
     }
+    
+    @Override
+    public boolean equals(Object obj) {
+        User user = (User) obj;
+        return (this.getName()      .equals(user.getName())      && 
+                this.getSurname()   .equals(user.getSurname())   &&
+                this.getBio()       .equals(user.getBio())       &&
+                this.getBirthDate() .equals(user.getBirthDate()) &&
+                this.getContacts()  .equals(user.getContacts()));
+    }
 	
 	// setters
 	public void setName(String name) {

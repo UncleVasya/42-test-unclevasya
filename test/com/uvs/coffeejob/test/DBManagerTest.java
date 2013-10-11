@@ -41,7 +41,6 @@ public class DBManagerTest {
 	}
 	
 	@Test
-	// TODO: override equal() in User
 	public void test_GetUsers() {
 		User user1 = UserManager.getDefaultUser();
 		User user2 = UserManager.getDefaultUser();
@@ -53,7 +52,7 @@ public class DBManagerTest {
 		List<User> fromDB = mDatabase.getUsers();
 		
 		assertEquals(2, fromDB.size());
-		assertEquals(user1.getName(), fromDB.get(0).getName());
-		assertEquals(user2.getName(), fromDB.get(1).getName());
+		assertEquals(user1, fromDB.get(0));
+		assertEquals(user2, fromDB.get(1));
 	}
 }
