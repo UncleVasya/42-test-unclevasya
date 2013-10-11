@@ -59,7 +59,7 @@ public class UserManagerTest {
 	
 	@Test
     public void test_getDefaultUser() {
-		User user = mUserManager.getDefaultUser();
+		User user = UserManager.getDefaultUser();
 		assertEquals(DEFAULT_NAME, user.getName());
         assertEquals(DEFAULT_SURNAME, user.getSurname());
         assertEquals(DEFAULT_BIO, user.getBio());

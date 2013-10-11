@@ -2,7 +2,6 @@
 <resources>
 
     <string name="app_name">coffeejob</string>
-    <string name="action_settings">Settings</string>
     <string name="myName_caption">My name: </string>
     <string name="myBio_caption"> My biography: </string>
     <string name="myBirth_caption"> My birth date: </string>
