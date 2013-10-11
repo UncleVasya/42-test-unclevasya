@@ -1,5 +1,6 @@
 package com.uvs.coffeejob;
 
+
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -9,14 +10,14 @@ import android.content.Context;
 public class UserManager {
 	private User mUser;
 	private Context mContext;
-	//private DBManager mDatabase;
+	private DBManager mDatabase;
 	
 	private static final UserManager instance = new UserManager();    
 	private UserManager() {}
 	
 	public void init(Context context) {
 		mContext = context;
-		//mDatabase = new DBManager(mContext);
+		mDatabase = new DBManager(mContext);
 		LoadData();
 	}
 	
@@ -24,9 +25,10 @@ public class UserManager {
 		return instance;
 	}
 	
+	// sets a new user and inserts it into DB
 	public void setUser(User user) {
 		mUser = user;
-		//mDatabase.insertMessage(message);
+		updateDB();
 	}
 	
 	public User getUser() {
@@ -34,8 +36,15 @@ public class UserManager {
 	}
 	
 	private void LoadData() {
-		//List<User> users = mDatabase.getUsers();
-		//mUser = users.isEmpty()? getDefaultUser(): users.get(0);
+		List<User> users = mDatabase.getUsers();
+		if (users.isEmpty()) {
+		    // DB doesn't exist or empty or broken;
+		    // create a new DB with default user
+		    setUser(getDefaultUser());
+		}
+		else {
+		    mUser = users.get(0);
+		}
 	}
 	
 	public static User getDefaultUser() {
@@ -62,7 +71,9 @@ public class UserManager {
 	}
 	
 	public void updateDB(){
-		//mDatabase.Clear();
-		//mDatabase.insertUser(getUser());
+		mDatabase.clearDB();
+		if (mUser != null) {
+		    mDatabase.addUser(mUser);
+		}
 	}
 }

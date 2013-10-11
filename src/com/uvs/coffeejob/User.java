@@ -9,7 +9,7 @@ public class User {
 	private String mName;
 	private String mSurname;
 	private String mBio;
-	private GregorianCalendar mBirthDate;
+	private GregorianCalendar mBirthDate = new GregorianCalendar();
     private List<UserContact> mContacts = new ArrayList<UserContact>();
 	
     public void addContact(UserContact contact) {
@@ -48,7 +48,7 @@ public class User {
 	}
 	
 	public void setBirthDate(GregorianCalendar date) {
-		mBirthDate = date;
+		mBirthDate.setTime(date.getTime());
 	}
 	
 	

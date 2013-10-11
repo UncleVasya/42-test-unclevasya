@@ -34,7 +34,7 @@ public class UserContact {
     @Override
 	public boolean equals(Object contact) {
     	UserContact uc = (UserContact) contact;
-    	return (this.getType() == uc.getType() && 
-    			this.getValue() == uc.getValue());
+    	return (this.getType().equals(uc.getType()) && 
+    			this.getValue().equals(uc.getValue()));
     }
 }
