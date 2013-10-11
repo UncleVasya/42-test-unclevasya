@@ -2,6 +2,7 @@
 <resources>
 
     <string name="app_name">coffeejob</string>
+    <string name="app_id">593638047340260</string>
     <string name="myName_caption">My name: </string>
     <string name="myBio_caption"> My biography: </string>
     <string name="myBirth_caption"> My birth date: </string>
