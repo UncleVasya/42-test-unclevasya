@@ -28,7 +28,7 @@ public class MainActivity extends Activity {
 			mUserManager.init(this);
 		}
 		
-		User me = mUserManager.getDefaultUser();
+		User me = UserManager.getDefaultUser();
 		showUserInfo(me);
 	}
 

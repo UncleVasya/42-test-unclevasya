@@ -38,7 +38,7 @@ public class UserManager {
 		//mUser = users.isEmpty()? getDefaultUser(): users.get(0);
 	}
 	
-	public User getDefaultUser() {
+	public static User getDefaultUser() {
 		final String DEFAULT_NAME    = "Oleg";
 		final String DEFAULT_SURNAME = "Ovcharenko";
 		final String DEFAULT_BIO     = "Nothing interesting here. " + 
