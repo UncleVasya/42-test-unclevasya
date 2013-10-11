@@ -6,6 +6,7 @@ import java.util.Locale;
 
 import android.os.Bundle;
 import android.app.Activity;
+import android.widget.TabHost;
 import android.widget.TextView;
 
 public class MainActivity extends Activity {
@@ -24,10 +25,23 @@ public class MainActivity extends Activity {
 		mUserBirth = (TextView)findViewById(R.id.userBirthText);
 		mUserContacts = (TextView)findViewById(R.id.userContactsText);
 		mUserManager = UserManager.getInstance();
+		
+		// setup tabs
+		TabHost tabs=(TabHost)findViewById(R.id.Tabhost);
+		tabs.setup();
+		TabHost.TabSpec spec = tabs.newTabSpec("tag1");
+		spec.setContent(R.id.tab1);
+		spec.setIndicator("User info");
+		tabs.addTab(spec);
+		spec = tabs.newTabSpec("tag2");
+		spec.setContent(R.id.tab2);
+		spec.setIndicator("Empty tab");
+		tabs.addTab(spec);
+		tabs.setCurrentTab(0);
+		
 		if(savedInstanceState == null) {
 			mUserManager.init(this);
 		}
-		
 		User me = mUserManager.getUser();
 		showUserInfo(me);
 	}

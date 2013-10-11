@@ -7,5 +7,6 @@
     <string name="myBio_caption"> My biography: </string>
     <string name="myBirth_caption"> My birth date: </string>
     <string name="myContacts_caption"> My contacts: </string>
+    <string name="towelPhoto"> Photo with towel </string>
 
 </resources>
