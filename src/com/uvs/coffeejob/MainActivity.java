@@ -36,6 +36,12 @@ public class MainActivity extends Activity {
              onSessionStateChange(session, state, exception);
         }
     };
+    
+    private static final List<String> mPermissions = Arrays.asList(
+            "user_birthday",
+            "user_about_me",
+            "email"
+    );
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -66,7 +72,12 @@ public class MainActivity extends Activity {
 		Log.i("onCreate()", Session.getActiveSession().toString());
 		if(savedInstanceState == null) {
 		    mUserManager.init(this);
-		    Session.openActiveSession(this, true, callback);
+		    Session session = Session.getActiveSession();
+		    //session.closeAndClearTokenInformation(); finish();
+		    OpenRequest openRequest = new OpenRequest(this);
+            openRequest.setPermissions(mPermissions);
+            openRequest.setCallback(callback);
+            session.openForRead(openRequest);
 		}
 		else {
 		    onSessionStateChange(Session.getActiveSession(), 
