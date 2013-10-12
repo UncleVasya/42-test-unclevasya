@@ -134,20 +134,48 @@ public class MainActivity extends Activity {
 	}
 	
 	private void showUserInfo(User user) {
-	    mUserName.setText(user.getName() + " " + user.getSurname());
-        mUserBio.setText(user.getBio());
-        mUserBirth.setText(userBirthToStr(user));
-        mUserContacts.setText(userContactsToStr(user));
+	    // user name
+	    String str = getString(R.string.noData);
+	    if (user.getName() != null && user.getSurname() != null) {
+	        str = user.getName() + " " + user.getSurname();
+	    }
+	    mUserName.setText(str);
+	    
+	    // user bio
+	    str = getString(R.string.noData);
+	    if (user.getBio() != null) {
+	        str = user.getBio();
+	    }
+        mUserBio.setText(str);
+        
+        // user birth date
+        str = userBirthToStr(user);
+        if (str == null) {
+            str = getString(R.string.noData);
+        }
+        mUserBirth.setText(str);
+        
+        // user contacts
+        str = userContactsToStr(user);
+        if (str == null) {
+            str = getString(R.string.noData);
+        }
+        mUserContacts.setText(str);
 	}
 	
 	private String userBirthToStr(User user) {
-		SimpleDateFormat format = new SimpleDateFormat("MMMM dd, yyyy", Locale.ENGLISH);
-		return format.format(user.getBirthDate().getTime());
+	    String result = null;
+	    if (user.getBirthDate() != null) {
+    		SimpleDateFormat format = new SimpleDateFormat("MMMM dd, yyyy", Locale.US);
+    		result = format.format(user.getBirthDate().getTime());
+	    }
+	    return result;
 	}
 	
 	private String userContactsToStr(User user) {
-		StringBuilder str_contacts = new StringBuilder();
+	    String result = null;
         if (user.getContacts() != null) {
+            StringBuilder str_contacts = new StringBuilder();
         	List<UserContact> contacts = user.getContacts();
         	UserContact contact = contacts.get(0);
         	str_contacts.append(contact.getType() + ": " + contact.getValue());
@@ -155,8 +183,9 @@ public class MainActivity extends Activity {
             	contact = contacts.get(i);
             	str_contacts.append("\n" + contact.getType() + ": " + contact.getValue());
             }
+            result = str_contacts.toString();
         }
-        return str_contacts.toString();
+        return result;
 	}
 	
 	private void clearUserInfo() {
