@@ -73,13 +73,16 @@ public class MainActivity extends Activity {
 		Log.i("onCreate()", Session.getActiveSession().toString());
 		if(savedInstanceState == null) {
 		    mUserManager.init(this);
-		    Session session = Session.getActiveSession();
-		    //session.closeAndClearTokenInformation(); finish();
-		    OpenRequest openRequest = new OpenRequest(this);
+		}
+		
+		Session session = Session.getActiveSession();
+        //session.closeAndClearTokenInformation(); finish();
+		if (session.isOpened() != true) {
+            OpenRequest openRequest = new OpenRequest(this);
             openRequest.setPermissions(mPermissions);
             openRequest.setCallback(callback);
             session.openForRead(openRequest);
-		}
+        }
 		else {
 		    onSessionStateChange(Session.getActiveSession(), 
 		                         Session.getActiveSession().getState(), null);
