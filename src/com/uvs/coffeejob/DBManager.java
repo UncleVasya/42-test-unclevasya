@@ -135,14 +135,22 @@ public class DBManager extends SQLiteOpenHelper {
     private List<UserContact> getUserContacts(long userID) {
         Log.i("DBManager", "getUserContacts()");
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query(CONTACTS, null, CONTACTS_USER + "=?",
-                                 new String[] {String.valueOf(userID)}, 
-                                 null, null, null, null);
         List<UserContact> contacts = new ArrayList<UserContact>();
-        while (cursor.moveToNext()) {
-            String type  = cursor.getString(1);
-            String value = cursor.getString(2);
-            contacts.add(new UserContact(type, value));
+        try {
+            Cursor cursor = db.query(CONTACTS, null, CONTACTS_USER + "=?",
+                                     new String[] {String.valueOf(userID)}, 
+                                     null, null, null, null);
+            while (cursor.moveToNext()) {
+                String type  = cursor.getString(1);
+                String value = cursor.getString(2);
+                contacts.add(new UserContact(type, value));
+            }
+            cursor.close();
+        }
+        catch (Exception e) {
+            db.execSQL("DROP TABLE IF EXISTS " + USERS);
+            db.execSQL("DROP TABLE IF EXISTS " + CONTACTS);
+            onCreate(db);
         }
         Log.i("DBManager", "contacts found: " + contacts.size());
         return contacts;
