@@ -1,5 +1,6 @@
 package com.uvs.coffeejob;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -10,6 +11,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
+import android.graphics.BitmapFactory;
 import android.provider.BaseColumns;
 import android.util.Log;
 
@@ -24,6 +28,7 @@ public class DBManager extends SQLiteOpenHelper {
     private static final String USERS_SURNAME     = "surname";
     private static final String USERS_BIO         = "bio";
     private static final String USERS_BIRTHDATE   = "birthdate";
+    private static final String USERS_PHOTO       = "userphoto";
     
     // ------------------- CONTACTS table------------------------
     private static final String CONTACTS          = "Contacts";
@@ -40,23 +45,24 @@ public class DBManager extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         // create USERS table
-        String sql = "create table " + USERS + "( " + 
+        String sql = "CREATE TABLE " + USERS + "( " + 
                         BaseColumns._ID   + " integer primary key autoincrement, " + 
-                        USERS_NAME        + " string, " + 
-                        USERS_SURNAME     + " string, " + 
-                        USERS_BIO         + " string, " + 
-                        USERS_BIRTHDATE   + " integer" + ");";
+                        USERS_NAME        + " string, "  + 
+                        USERS_SURNAME     + " string, "  + 
+                        USERS_BIO         + " string, "  + 
+                        USERS_BIRTHDATE   + " integer, " +
+                        USERS_PHOTO       + " blob "	 + ");";
         Log.i("DBManager", "onCreate(): \n\n" + sql);
         db.execSQL(sql);
      
         // create CONTACTS table
-        sql = "create table " + CONTACTS + "( " + 
+        sql = "CREATE TABLE " + CONTACTS + "( " + 
                         BaseColumns._ID   + " integer primary key autoincrement, " + 
                         CONTACTS_TYPE     + " string not null, "  + 
                         CONTACTS_VALUE    + " string not null, "  + 
                         CONTACTS_USER     + " integer not null, " + 
-                            "foreign key(" + CONTACTS_USER + ") " +
-                            "references "  + USERS + "(" + BaseColumns._ID + ")" + ")";
+                            "FOREIGN KEY(" + CONTACTS_USER + ") " +
+                            "REFERENCES "  + USERS + "(" + BaseColumns._ID + ")" + ")";
         Log.i("DBManager", "onCreate(): \n\n" + sql);
         db.execSQL(sql);
     }
@@ -72,10 +78,16 @@ public class DBManager extends SQLiteOpenHelper {
             values.put(USERS_SURNAME, user.getSurname());
         }
         if (user.getBio() != null) {
-            //values.put(USERS_BIO, user.getBio());
+            values.put(USERS_BIO, user.getBio());
         }
         if (user.getBirthDate() != null) {
-            //values.put(USERS_BIRTHDATE, user.getBirthDate().getTime().getTime());
+            values.put(USERS_BIRTHDATE, user.getBirthDate().getTime().getTime());
+        }
+        
+        if (user.getPhoto() != null) {
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            user.getPhoto().compress(CompressFormat.PNG, 0, stream);
+            values.put(USERS_PHOTO, stream.toByteArray());
         }
 
         SQLiteDatabase db = getWritableDatabase();
@@ -115,22 +127,27 @@ public class DBManager extends SQLiteOpenHelper {
                 User user = new User();
                 long userID = cursor.getLong(0);
                 
-                if (cursor.isNull(1) != true) {
+                if (cursor.isNull(1) != true) { // name
                     user.setName(cursor.getString(1));
                 }
-                if (cursor.isNull(2) != true) {
+                if (cursor.isNull(2) != true) { // surname
                     user.setSurname(cursor.getString(2));
                 }
-                if (cursor.isNull(3) != true) {
+                if (cursor.isNull(3) != true) { // biography
                     user.setBio(cursor.getString(3));
                 }
-                if (cursor.isNull(4) != true) {
+                if (cursor.isNull(4) != true) { // birth date
                     GregorianCalendar birthDate = new GregorianCalendar();
                     birthDate.setTime(new Date(cursor.getLong(4)));
                     user.setBirthDate(birthDate);
-                } 
+                }
+                if (cursor.isNull(5) != true) { // photo
+                    byte[] blob = cursor.getBlob(5);
+                    Bitmap photo = BitmapFactory.decodeByteArray(blob, 0, blob.length);
+                    user.setPhoto(photo);
+                }
                 List<UserContact> contacts = getUserContacts(userID);
-                for (UserContact contact: contacts) {
+                for (UserContact contact: contacts) { // contacts
                     user.addContact(contact);
                 }
                 

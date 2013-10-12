@@ -7,7 +7,7 @@
     <string name="myBio_caption"> My biography: </string>
     <string name="myBirth_caption"> My birth date: </string>
     <string name="myContacts_caption"> My contacts: </string>
-    <string name="towelPhoto"> Photo with towel </string>
+    <string name="userPhoto">User photo</string>
     <string name="pleaseLoginWithFacebook">Please login with Facebook to use this application</string>
     <string name="login">Login</string>
     <string name="close">Close</string>

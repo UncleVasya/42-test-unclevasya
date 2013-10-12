@@ -20,16 +20,18 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TabHost;
 import android.widget.TextView;
 
 public class MainActivity extends Activity {
 	private UserManager mUserManager;
-	private TextView mUserName;
-	private TextView mUserBio;
-	private TextView mUserBirth;
-	private TextView mUserContacts;
-	private Button   mCloseBtn;
+	private TextView    mUserName;
+	private TextView    mUserBio;
+	private TextView    mUserBirth;
+	private TextView    mUserContacts;
+	private ImageView   mUserPhoto;
+	private Button      mCloseBtn;
 	
 	private ProgressDialog mProgress; 
 	
@@ -58,6 +60,7 @@ public class MainActivity extends Activity {
 		mUserBio      = (TextView) findViewById(R.id.userBioText);
 		mUserBirth    = (TextView) findViewById(R.id.userBirthText);
 		mUserContacts = (TextView) findViewById(R.id.userContactsText);
+		mUserPhoto    = (ImageView)findViewById(R.id.userPhotoView);
 		mUserManager  = UserManager.getInstance();
 		mCloseBtn     = (Button)   findViewById(R.id.closeButton);
 		mCloseBtn.setOnClickListener(onClickListener);
@@ -200,6 +203,9 @@ public class MainActivity extends Activity {
         }
         mUserBirth.setText(str);
         
+        // user photo
+        mUserPhoto.setImageBitmap(user.getPhoto());
+        
         // user contacts
         str = userContactsToStr(user);
         if (str == null) {
@@ -237,6 +243,7 @@ public class MainActivity extends Activity {
 		mUserName.setText(null);
 		mUserBio.setText(null);
 		mUserBirth.setText(null);
+		mUserPhoto.setImageBitmap(null);
 		mUserContacts.setText(null);
 	}
 	

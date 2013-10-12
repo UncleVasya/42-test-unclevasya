@@ -1,13 +1,19 @@
 package com.uvs.coffeejob;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
+
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
+import android.graphics.BitmapFactory;
 
 public class User {
 	private String mName;
 	private String mSurname;
 	private String mBio;
+	private Bitmap mPhoto;
 	private GregorianCalendar mBirthDate;
     private List<UserContact> mContacts;
 	
@@ -52,6 +58,10 @@ public class User {
 		mBio = bio;
 	}
 	
+	public void setPhoto(Bitmap photo) {
+	    mPhoto = photo;
+	}
+	
 	public void setBirthDate(GregorianCalendar date) {
 	    if (date != null) {
 	        if (mBirthDate == null) {
@@ -76,6 +86,10 @@ public class User {
 	
 	public String getBio() {
 		return mBio;
+	}
+	
+	public Bitmap getPhoto() {
+	    return mPhoto;
 	}
 	
 	public GregorianCalendar getBirthDate() {

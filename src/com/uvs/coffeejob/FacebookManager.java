@@ -1,5 +1,9 @@
 package com.uvs.coffeejob;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -11,6 +15,8 @@ import com.facebook.Response;
 import com.facebook.Session;
 import com.facebook.model.GraphUser;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
 public class FacebookManager {
@@ -33,6 +39,21 @@ public class FacebookManager {
             user.setName(graphUser.getFirstName());
             user.setSurname(graphUser.getLastName());
             user.setBio((String) graphUser.getProperty("bio"));
+            
+            // photo
+            Bitmap photo = null;
+            try {
+                URL bitmapURL = new URL("https://graph.facebook.com/" + 
+                                        graphUser.getId() + "/picture?" +
+                                        "width=" + 128 + "&height=" + 128
+                );
+                InputStream stream = bitmapURL.openConnection().getInputStream();
+                photo = BitmapFactory.decodeStream(stream);
+            } catch (Exception e) {
+                photo = null;
+            }
+            user.setPhoto(photo);
+           
             
             // birth date
             GregorianCalendar birth;

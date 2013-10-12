@@ -92,11 +92,12 @@
                         </LinearLayout>
 
                         <ImageView
-                            android:id="@+id/ImageView"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:contentDescription="@string/towelPhoto"
-                            android:src="@drawable/uvs_towel" />
+                            android:id="@+id/userPhotoView"
+                            android:layout_width="@dimen/userPhotoWidth"
+                            android:layout_height="@dimen/userPhotoHeight"
+                            android:adjustViewBounds="false"
+                            android:contentDescription="@string/userPhoto"
+                            android:scaleType="fitXY" />
 
                         <TextView
                             android:id="@+id/TextView02"
