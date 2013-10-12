@@ -6,6 +6,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import android.content.Context;
+import android.util.Log;
 
 public class UserManager {
 	private User mUser;
@@ -18,7 +19,6 @@ public class UserManager {
 	public void init(Context context) {
 		mContext = context;
 		mDatabase = new DBManager(mContext);
-		//LoadData();
 	}
 	
 	public static UserManager getInstance() {
@@ -32,8 +32,19 @@ public class UserManager {
 	}
 	
 	public User getUser() {
+	    final String TAG = "UserManager.GetUser()"; 
 	    if (mUser == null) {
-	        mUser = FacebookManager.getUser();
+	        // if we don't have user info in memory
+	        // go look in DB
+	        Log.i(TAG, "no user in memory; look in DB");
+	        mUser = getUserFromDB();
+	        if (mUser == null) {
+	            // still don't have it?
+	            // go look at Facebook
+	            Log.i(TAG, "no user in DB; go to Facebook");
+	            mUser = FacebookManager.getUser();
+	            updateDB();
+	        }
 	    }
 		return mUser;
 	}
@@ -42,37 +53,11 @@ public class UserManager {
 	    return (mUser != null);
 	}
 	
-	private void LoadData() {
-		List<User> users = mDatabase.getUsers();
-		if (users.isEmpty()) {
-		    // DB doesn't exist or empty or broken;
-		    // create a new DB with default user
-		    setUser(getDefaultUser());
-		}
-		else {
-		    mUser = users.get(0);
-		}
-	}
-	
-	public static User getDefaultUser() {
-		final String DEFAULT_NAME    = "Oleg";
-		final String DEFAULT_SURNAME = "Ovcharenko";
-		final String DEFAULT_BIO     = "Nothing interesting here. " + 
-				                       "Just a man from Belogorsk.";
-		final GregorianCalendar DEFAULT_BIRTH = new GregorianCalendar(1991, 00, 01);
-		final List<UserContact> DEFAULT_CONTACTS = new ArrayList<UserContact>(){{
-			add(new UserContact("ICQ", "1234567"));
-			add(new UserContact("Jabber", "uvs.jabber.org"));
-			add(new UserContact("Phone", "9379992"));
-		}};
-
-		User user = new User();
-		user.setName(DEFAULT_NAME);
-		user.setSurname(DEFAULT_SURNAME);
-		user.setBio(DEFAULT_BIO);
-		user.setBirthDate(DEFAULT_BIRTH);
-		for (UserContact contact: DEFAULT_CONTACTS) {
-			user.addContact(contact);
+	private User getUserFromDB() {
+	    User user = null;
+		List<User> usersFromDB = mDatabase.getUsers();
+		if (usersFromDB.isEmpty() != true) {
+		    user = usersFromDB.get(0);
 		}
 		return user;
 	}
