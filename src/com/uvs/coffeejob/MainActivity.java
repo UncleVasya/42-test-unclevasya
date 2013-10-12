@@ -145,7 +145,7 @@ public class MainActivity extends Activity {
                 showUserInfo(user);
             }
             if (mProgress != null && mProgress.isShowing()) {
-                mProgress.dismiss();
+                mProgress.cancel();
             }
         }
 	}
@@ -224,7 +224,7 @@ public class MainActivity extends Activity {
         uiHelper.onPause();
         
         if (mProgress != null && mProgress.isShowing()) {
-            mProgress.dismiss();
+            mProgress.cancel();
         }
         mProgress = null;
     }
