@@ -103,7 +103,7 @@
                             android:id="@+id/userBioText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textAppearance="?android:attr/textAppearanceMedium" />
+                            android:textStyle="italic" />
 
                         <TextView
                             android:id="@+id/TextView03"
@@ -118,7 +118,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="20dp"
-                            android:textAppearance="?android:attr/textAppearanceMedium" />
+                            android:textStyle="italic" />
+
                     </LinearLayout>
 
                     <LinearLayout

@@ -58,7 +58,7 @@ public class MainActivity extends Activity {
 		mUserManager = UserManager.getInstance();
 		
 		// setup tabs
-		TabHost tabs=(TabHost)findViewById(R.id.Tabhost);
+		TabHost tabs = (TabHost)findViewById(R.id.Tabhost);
 		tabs.setup();
 		TabHost.TabSpec spec = tabs.newTabSpec("tag1");
 		spec.setContent(R.id.tab1);

@@ -56,7 +56,7 @@ public class MainActivityTest {
 		assertEquals(user.getName() + " " + user.getSurname(), mUserName.getText().toString());
 		assertEquals(user.getBio(), mUserBio.getText().toString());
 		
-		SimpleDateFormat format = new SimpleDateFormat("MMMM dd, yyyy", Locale.ENGLISH);
+		SimpleDateFormat format = new SimpleDateFormat("MMMM dd, yyyy", Locale.US);
 		assertEquals(format.format(user.getBirthDate().getTime()), mUserBirth.getText().toString());
 		
 		StringBuilder str_contacts = new StringBuilder();
