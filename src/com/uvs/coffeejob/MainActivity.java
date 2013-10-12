@@ -1,9 +1,11 @@
 package com.uvs.coffeejob;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import com.facebook.Session;
+import com.facebook.Session.OpenRequest;
 import com.facebook.SessionState;
 import com.facebook.UiLifecycleHelper;
 import android.os.AsyncTask;
@@ -54,7 +56,6 @@ public class MainActivity extends Activity {
 		mUserBirth = (TextView)findViewById(R.id.userBirthText);
 		mUserContacts = (TextView)findViewById(R.id.userContactsText);
 		mUserManager = UserManager.getInstance();
-		mProgress = new ProgressDialog(this);
 		
 		// setup tabs
 		TabHost tabs=(TabHost)findViewById(R.id.Tabhost);
@@ -117,17 +118,19 @@ public class MainActivity extends Activity {
 	
 	private class ShowUserInfo extends AsyncTask<Void, Void, User> {
         protected void onPreExecute() {
-            clearUserInfo();
-           //if (mUserManager.getUser() == null) {
-                // show progress dialog only if we're going to do
-                // some time consuming job: operate with DB or Facebook;
-                mProgress.setMessage(getString(R.string.gettingUser));
-                mProgress.setOnCancelListener(new OnCancelListener() {
-                    public void onCancel(DialogInterface dialog) {
+           clearUserInfo();
+           if (mUserManager.isUserCached() != true) {
+               // show progress dialog only if we're going to do
+               // some time consuming job: operate with DB or Facebook;
+               mProgress = new ProgressDialog(MainActivity.this);
+               mProgress.setMessage(getString(R.string.gettingUser));
+               mProgress.setOnCancelListener(new OnCancelListener() {
+                   public void onCancel(DialogInterface dialog) {
                        cancel(false);
-                    }
-                });
-                mProgress.show();
+                   }
+               });
+               mProgress.show();
+           }
         }
         
         protected User doInBackground(Void...params) {

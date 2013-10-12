@@ -18,7 +18,7 @@ public class UserManager {
 	public void init(Context context) {
 		mContext = context;
 		mDatabase = new DBManager(mContext);
-		LoadData();
+		//LoadData();
 	}
 	
 	public static UserManager getInstance() {
@@ -32,7 +32,14 @@ public class UserManager {
 	}
 	
 	public User getUser() {
+	    if (mUser == null) {
+	        mUser = FacebookManager.getUser();
+	    }
 		return mUser;
+	}
+	
+	public boolean isUserCached() {
+	    return (mUser != null);
 	}
 	
 	private void LoadData() {
