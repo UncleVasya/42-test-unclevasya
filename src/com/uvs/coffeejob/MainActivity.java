@@ -16,7 +16,6 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -63,6 +62,8 @@ public class MainActivity extends Activity {
 		mCloseBtn     = (Button)   findViewById(R.id.closeButton);
 		mCloseBtn.setOnClickListener(onClickListener);
 		
+		final String TAG = "MainActivity.OnCreate()";
+		
 		// setup tabs
 		TabHost tabs = (TabHost)findViewById(R.id.Tabhost);
 		tabs.setup();
@@ -76,22 +77,29 @@ public class MainActivity extends Activity {
 		tabs.addTab(spec);
 		tabs.setCurrentTab(0);
 		
-		Log.i("onCreate()", Session.getActiveSession().toString());
+		// init UserManager (DB + Facebook handlers)
+		Log.i(TAG, Session.getActiveSession().toString());
 		if(savedInstanceState == null) {
 		    mUserManager.init(this);
 		}
 		
+		// auth with Facebook
 		Session session = Session.getActiveSession();
-        //session.closeAndClearTokenInformation(); finish();
-		if (session.isOpened() != true) {
+		if (session.isOpened() ||
+		    session.getState().equals(SessionState.CREATED_TOKEN_LOADED))
+		{
+		    Log.i(TAG, "We have correct session. User it.");
+            onSessionStateChange(Session.getActiveSession(), 
+                                 Session.getActiveSession().getState(), null);
+        }
+		else {
+		    Log.i(TAG, "No correct session found. Create a new one.");
+            session = new Session(this);
             OpenRequest openRequest = new OpenRequest(this);
             openRequest.setPermissions(mPermissions);
             openRequest.setCallback(callback);
-            session.openForRead(openRequest);
-        }
-		else {
-		    onSessionStateChange(Session.getActiveSession(), 
-		                         Session.getActiveSession().getState(), null);
+            Session.setActiveSession(session);
+            Session.getActiveSession().openForRead(openRequest);
 		}
 	}
 	
