@@ -42,10 +42,10 @@ public class DBManager extends SQLiteOpenHelper {
         // create USERS table
         String sql = "create table " + USERS + "( " + 
                         BaseColumns._ID   + " integer primary key autoincrement, " + 
-                        USERS_NAME        + " string not null, " + 
-                        USERS_SURNAME     + " string not null, " + 
-                        USERS_BIO         + " string not null, " + 
-                        USERS_BIRTHDATE   + " integer not null" + ");";
+                        USERS_NAME        + " string, " + 
+                        USERS_SURNAME     + " string, " + 
+                        USERS_BIO         + " string, " + 
+                        USERS_BIRTHDATE   + " integer" + ");";
         Log.i("DBManager", "onCreate(): \n\n" + sql);
         db.execSQL(sql);
      
@@ -64,11 +64,20 @@ public class DBManager extends SQLiteOpenHelper {
     public void addUser(User user) {
         Log.i("DBManager", "addUser()");
         ContentValues values = new ContentValues();
-        values.put(USERS_NAME,        user.getName());
-        values.put(USERS_SURNAME,     user.getSurname());
-        values.put(USERS_BIO,         user.getBio());
-        values.put(USERS_BIRTHDATE,   user.getBirthDate().getTime().getTime());
         
+        if (user.getName() != null) {
+            values.put(USERS_NAME, user.getName());
+        }
+        if (user.getSurname() != null) {
+            values.put(USERS_SURNAME, user.getSurname());
+        }
+        if (user.getBio() != null) {
+            //values.put(USERS_BIO, user.getBio());
+        }
+        if (user.getBirthDate() != null) {
+            //values.put(USERS_BIRTHDATE, user.getBirthDate().getTime().getTime());
+        }
+
         SQLiteDatabase db = getWritableDatabase();
         Long userID = db.insert(USERS, null, values);
         addContacts(user.getContacts(), userID);
@@ -105,14 +114,21 @@ public class DBManager extends SQLiteOpenHelper {
             while (cursor.moveToNext()) {
                 User user = new User();
                 long userID = cursor.getLong(0);
-                user.setName(cursor.getString(1));
-                user.setSurname(cursor.getString(2));
-                user.setBio(cursor.getString(3));
                 
-                GregorianCalendar birthDate = new GregorianCalendar();
-                birthDate.setTime(new Date(cursor.getLong(4)));
-                user.setBirthDate(birthDate);
-                
+                if (cursor.isNull(1) != true) {
+                    user.setName(cursor.getString(1));
+                }
+                if (cursor.isNull(2) != true) {
+                    user.setSurname(cursor.getString(2));
+                }
+                if (cursor.isNull(3) != true) {
+                    user.setBio(cursor.getString(3));
+                }
+                if (cursor.isNull(4) != true) {
+                    GregorianCalendar birthDate = new GregorianCalendar();
+                    birthDate.setTime(new Date(cursor.getLong(4)));
+                    user.setBirthDate(birthDate);
+                } 
                 List<UserContact> contacts = getUserContacts(userID);
                 for (UserContact contact: contacts) {
                     user.addContact(contact);

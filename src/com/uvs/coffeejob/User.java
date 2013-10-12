@@ -8,14 +8,20 @@ public class User {
 	private String mName;
 	private String mSurname;
 	private String mBio;
-	private GregorianCalendar mBirthDate = new GregorianCalendar();
-    private List<UserContact> mContacts = new ArrayList<UserContact>();
+	private GregorianCalendar mBirthDate;
+    private List<UserContact> mContacts;
 	
     public void addContact(UserContact contact) {
-    	mContacts.add(contact);
+        if (mContacts == null) {
+            mContacts = new ArrayList<UserContact>();
+        }
+        mContacts.add(contact);
     }
     
     public void addContact(String type, String value) {
+        if (mContacts == null) {
+            mContacts = new ArrayList<UserContact>();
+        }
     	mContacts.add(new UserContact(type, value));
     }
     
@@ -48,6 +54,9 @@ public class User {
 	
 	public void setBirthDate(GregorianCalendar date) {
 	    if (date != null) {
+	        if (mBirthDate == null) {
+	            mBirthDate = new GregorianCalendar();
+	        }
 	        mBirthDate.setTime(date.getTime());
 	    }
 	    else {
