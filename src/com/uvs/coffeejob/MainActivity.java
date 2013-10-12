@@ -18,6 +18,9 @@ import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.TabHost;
 import android.widget.TextView;
 
@@ -27,6 +30,7 @@ public class MainActivity extends Activity {
 	private TextView mUserBio;
 	private TextView mUserBirth;
 	private TextView mUserContacts;
+	private Button   mCloseBtn;
 	
 	private ProgressDialog mProgress; 
 	
@@ -49,13 +53,15 @@ public class MainActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		uiHelper = new UiLifecycleHelper(this, callback);
+		uiHelper      = new UiLifecycleHelper(this, callback);
         uiHelper.onCreate(savedInstanceState);
-		mUserName = (TextView)findViewById(R.id.userNameText);
-		mUserBio = (TextView)findViewById(R.id.userBioText);
-		mUserBirth = (TextView)findViewById(R.id.userBirthText);
-		mUserContacts = (TextView)findViewById(R.id.userContactsText);
-		mUserManager = UserManager.getInstance();
+		mUserName     = (TextView) findViewById(R.id.userNameText);
+		mUserBio      = (TextView) findViewById(R.id.userBioText);
+		mUserBirth    = (TextView) findViewById(R.id.userBirthText);
+		mUserContacts = (TextView) findViewById(R.id.userContactsText);
+		mUserManager  = UserManager.getInstance();
+		mCloseBtn     = (Button)   findViewById(R.id.closeButton);
+		mCloseBtn.setOnClickListener(onClickListener);
 		
 		// setup tabs
 		TabHost tabs = (TabHost)findViewById(R.id.Tabhost);
@@ -88,6 +94,20 @@ public class MainActivity extends Activity {
 		                         Session.getActiveSession().getState(), null);
 		}
 	}
+	
+	private OnClickListener onClickListener = new OnClickListener() {
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.closeButton:
+                    Session session = Session.getActiveSession();
+                    if (session != null) {
+                        session.closeAndClearTokenInformation();
+                    }
+                    MainActivity.this.finish();
+                    break;
+            }
+        }
+    };
 	
 	private void onSessionStateChange(Session session, SessionState state, Exception exception) {
         Log.i("onSessionStateChanged", session.toString());

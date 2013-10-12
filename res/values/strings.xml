@@ -13,5 +13,6 @@
     <string name="close">Close</string>
     <string name="gettingUser">Getting user info...</string>
     <string name="noData">No data</string>
+    <string name="signOutAndClose">Sign out and close application</string>
 
 </resources>
