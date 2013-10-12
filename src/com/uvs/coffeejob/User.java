@@ -47,7 +47,12 @@ public class User {
 	}
 	
 	public void setBirthDate(GregorianCalendar date) {
-		mBirthDate.setTime(date.getTime());
+	    if (date != null) {
+	        mBirthDate.setTime(date.getTime());
+	    }
+	    else {
+	        mBirthDate = null;
+	    }
 	}
 	
 	
