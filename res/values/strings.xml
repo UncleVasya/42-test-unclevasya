@@ -14,5 +14,7 @@
     <string name="gettingUser">Getting user info...</string>
     <string name="noData">No data</string>
     <string name="signOutAndClose">Sign out and close application</string>
-
+    <string name="pleaseFindNetworkConnection">No network. Please find working Internet connection to use this application</string>
+    <string name="cannotGetUserInfo">Cannot get user info. Must be Network problem</string>
+    <string name="tryAgain">Try again</string>
 </resources>

@@ -49,6 +49,12 @@ public class MainActivity extends Activity {
             "user_about_me",
             "email"
     );
+    
+    private enum ActivityState {
+        CREATED,
+        CONNECTION_ESTABLISHED, 
+        FACEBOOK_SIGNED_IN, 
+    }
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -80,29 +86,20 @@ public class MainActivity extends Activity {
 		tabs.addTab(spec);
 		tabs.setCurrentTab(0);
 		
-		// init UserManager (DB + Facebook handlers)
 		Log.i(TAG, Session.getActiveSession().toString());
 		if(savedInstanceState == null) {
+		    // application just launched, start from beginning
 		    mUserManager.init(this);
+		    onActivityStateChange(ActivityState.CREATED);
 		}
-		
-		// auth with Facebook
-		Session session = Session.getActiveSession();
-		if (session.isOpened() ||
-		    session.getState().equals(SessionState.CREATED_TOKEN_LOADED))
-		{
-		    Log.i(TAG, "We have correct session. User it.");
-            onSessionStateChange(Session.getActiveSession(), 
-                                 Session.getActiveSession().getState(), null);
-        }
 		else {
-		    Log.i(TAG, "No correct session found. Create a new one.");
-            session = new Session(this);
-            OpenRequest openRequest = new OpenRequest(this);
-            openRequest.setPermissions(mPermissions);
-            openRequest.setCallback(callback);
-            Session.setActiveSession(session);
-            Session.getActiveSession().openForRead(openRequest);
+		    // activity recreated (maybe after rotation);
+		    // see if we can skip few steps
+		    if (mUserManager.isUserCached() || 
+		        Session.getActiveSession().isOpened())
+		    {
+		        onActivityStateChange(ActivityState.FACEBOOK_SIGNED_IN);
+		    }
 		}
 	}
 	
@@ -119,11 +116,72 @@ public class MainActivity extends Activity {
             }
         }
     };
+    
+    private void onActivityStateChange(ActivityState state) {
+        final String TAG = "MainActivity";
+        switch (state) {
+        case CREATED:
+            // check for internet access
+            if (NetworkManager.isOnline(this)) {
+                onActivityStateChange(ActivityState.CONNECTION_ESTABLISHED);
+            }
+            else {
+                Log.i(TAG, "No connection");
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which){
+                        case DialogInterface.BUTTON_POSITIVE:
+                            // try again
+                            onActivityStateChange(ActivityState.CREATED);
+                            break;
+                        case DialogInterface.BUTTON_NEGATIVE:
+                            // close application
+                            finish();
+                            break;
+                        }
+                    }
+                };
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setMessage(R.string.pleaseFindNetworkConnection)
+                       .setPositiveButton(R.string.tryAgain, dialogClickListener)
+                       .setNegativeButton(R.string.close, dialogClickListener)
+                       .show();
+            }
+            break;
+        case CONNECTION_ESTABLISHED:
+            Log.i(TAG, "Connection established");
+            // auth with Facebook
+            Session session = Session.getActiveSession();
+            if (session.isOpened() ||
+                session.getState().equals(SessionState.CREATED_TOKEN_LOADED))
+            {
+                Log.i(TAG, "We have correct session. User it.");
+                onSessionStateChange(Session.getActiveSession(), 
+                                     Session.getActiveSession().getState(), null);
+            }
+            else {
+                Log.i(TAG, "No correct session found. Create a new one.");
+                session = new Session(this);
+                OpenRequest openRequest = new OpenRequest(this);
+                openRequest.setPermissions(mPermissions);
+                openRequest.setCallback(callback);
+                Session.setActiveSession(session);
+                Session.getActiveSession().openForRead(openRequest);
+            }
+            break;
+        case FACEBOOK_SIGNED_IN:
+            Log.i(TAG, "Signed in with Facebook");
+            new ShowUserInfo().execute();
+            break;
+        }
+    }
 	
 	private void onSessionStateChange(Session session, SessionState state, Exception exception) {
         Log.i("onSessionStateChanged", session.toString());
-        if (state.isOpened()) {
-            new ShowUserInfo().execute();
+        if (state.isOpened() && NetworkManager.isOnline(this)) {
+            onActivityStateChange(ActivityState.FACEBOOK_SIGNED_IN);
         }
         else if (state.equals(SessionState.CLOSED_LOGIN_FAILED)){   
             DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
@@ -152,7 +210,6 @@ public class MainActivity extends Activity {
 	
 	private class ShowUserInfo extends AsyncTask<Void, Void, User> {
         protected void onPreExecute() {
-           clearUserInfo();
            if (mUserManager.isUserCached() != true) {
                // show progress dialog only if we're going to do
                // some time consuming job: operate with DB or Facebook;
@@ -172,11 +229,50 @@ public class MainActivity extends Activity {
         }
         
         protected void onPostExecute(User user) {
-            if (user != null) {
-                showUserInfo(user);
-            }
             if (mProgress != null && mProgress.isShowing()) {
                 mProgress.cancel();
+            }
+            clearUserInfo();
+            if (user != null) {
+                // we have successfully got a user info
+                showUserInfo(user);
+            }
+            else {
+                // we couldn't get user info from DB or Facebook;
+                // this possible only theoretically in cases:
+                //      - connection gone during the request;
+                //      - connection considered as opened but doesn't work really;
+                //      - Facebook API changed;
+                
+                if (NetworkManager.isOnline(MainActivity.this)) {
+                    // this is NOT a connection problem;
+                    // ask user if he wants to try again or close the application
+                    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            switch (which){
+                            case DialogInterface.BUTTON_POSITIVE:
+                                // try again
+                                onActivityStateChange(ActivityState.FACEBOOK_SIGNED_IN);
+                                break;
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                // close application
+                                finish();
+                                break;
+                            }
+                        }
+                    };
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                    builder.setMessage(R.string.cannotGetUserInfo)
+                           .setPositiveButton(R.string.tryAgain, dialogClickListener)
+                           .setNegativeButton(R.string.close, dialogClickListener)
+                           .show();
+                }
+                else {
+                    // this IS a connection problem;
+                    // go back to previous state (before CONNECTION_ESTABLISHED)
+                    onActivityStateChange(ActivityState.CREATED);
+                }
             }
         }
 	}
