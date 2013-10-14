@@ -1,14 +1,11 @@
 package com.uvs.coffeejob.test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
-import org.robolectric.util.Transcript;
-
 import android.app.Activity;
 import android.os.AsyncTask;
 

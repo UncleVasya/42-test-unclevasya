@@ -1,20 +1,15 @@
 package com.uvs.coffeejob.test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
-
 import android.app.Activity;
-
 import com.uvs.coffeejob.DBManager;
-import com.uvs.coffeejob.MainActivity;
 import com.uvs.coffeejob.User;
 
 @RunWith(RobolectricTestRunner.class)

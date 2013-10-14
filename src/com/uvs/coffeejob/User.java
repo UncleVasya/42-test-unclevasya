@@ -1,13 +1,10 @@
 package com.uvs.coffeejob;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 
 import android.graphics.Bitmap;
-import android.graphics.Bitmap.CompressFormat;
-import android.graphics.BitmapFactory;
 
 public class User {
 	private String mName;

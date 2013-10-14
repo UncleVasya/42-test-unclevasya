@@ -3,14 +3,11 @@ package com.uvs.coffeejob.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-import java.util.GregorianCalendar;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 
 import com.uvs.coffeejob.User;
-import com.uvs.coffeejob.UserContact;
 
 @RunWith(RobolectricTestRunner.class)
 public class UserTest {
