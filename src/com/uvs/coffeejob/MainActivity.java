@@ -1,5 +1,7 @@
 package com.uvs.coffeejob;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
@@ -16,6 +18,11 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.pm.Signature;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -32,8 +39,12 @@ public class MainActivity extends Activity {
 	private TextView    mUserContacts;
 	private ImageView   mUserPhoto;
 	private Button      mCloseBtn;
+	private TabHost     mTabs;
 	
-	private ProgressDialog mProgress; 
+	private AlertDialog      mAlertDialog;
+	private ProgressDialog   mProgressDialog;
+	
+	private static RetrieveUserTask mRetrieveUserTask;
 	
 	private UiLifecycleHelper uiHelper;
     private Session.StatusCallback callback = 
@@ -50,18 +61,26 @@ public class MainActivity extends Activity {
             "email"
     );
     
+    private static final String ACTIVITY_STATE = "ActivityState";
     private enum ActivityState {
         CREATED,
         CONNECTION_ESTABLISHED, 
-        FACEBOOK_SIGNED_IN, 
+        FACEBOOK_SIGNED_IN,
+        USER_RETRIEVED
     }
+    private ActivityState mActivityState;
+    
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+	    final String TAG = "MainActivity.OnCreate()";
+	    logKeyHash();
+	    
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		uiHelper      = new UiLifecycleHelper(this, callback);
         uiHelper.onCreate(savedInstanceState);
+        mTabs         = (TabHost)findViewById(R.id.Tabhost);
 		mUserName     = (TextView) findViewById(R.id.userNameText);
 		mUserBio      = (TextView) findViewById(R.id.userBioText);
 		mUserBirth    = (TextView) findViewById(R.id.userBirthText);
@@ -70,23 +89,9 @@ public class MainActivity extends Activity {
 		mUserManager  = UserManager.getInstance();
 		mCloseBtn     = (Button)   findViewById(R.id.closeButton);
 		mCloseBtn.setOnClickListener(onClickListener);
+		setupTabs();
 		
-		final String TAG = "MainActivity.OnCreate()";
-		
-		// setup tabs
-		TabHost tabs = (TabHost)findViewById(R.id.Tabhost);
-		tabs.setup();
-		TabHost.TabSpec spec = tabs.newTabSpec("tag1");
-		spec.setContent(R.id.tab1);
-		spec.setIndicator("User info");
-		tabs.addTab(spec);
-		spec = tabs.newTabSpec("tag2");
-		spec.setContent(R.id.tab2);
-		spec.setIndicator("Empty tab");
-		tabs.addTab(spec);
-		tabs.setCurrentTab(0);
-		
-		Log.i(TAG, Session.getActiveSession().toString());
+		Log.i(TAG, Session.getActiveSession().toString()); 
 		if(savedInstanceState == null) {
 		    // application just launched, start from beginning
 		    mUserManager.init(this);
@@ -94,13 +99,23 @@ public class MainActivity extends Activity {
 		}
 		else {
 		    // activity recreated (maybe after rotation);
-		    // see if we can skip few steps
-		    if (mUserManager.isUserCached() || 
-		        Session.getActiveSession().isOpened())
-		    {
-		        onActivityStateChange(ActivityState.FACEBOOK_SIGNED_IN);
-		    }
+		    // restore previous state
+		    String state_str = savedInstanceState.getString(ACTIVITY_STATE);
+		    onActivityStateChange(ActivityState.valueOf(state_str));
 		}
+	}
+	
+	private void setupTabs() {
+	    mTabs.setup();
+        TabHost.TabSpec spec = mTabs.newTabSpec("tag1");
+        spec.setContent(R.id.tab1);
+        spec.setIndicator("User info");
+        mTabs.addTab(spec);
+        spec = mTabs.newTabSpec("tag2");
+        spec.setContent(R.id.tab2);
+        spec.setIndicator("Empty tab");
+        mTabs.addTab(spec);
+        mTabs.setCurrentTab(0);
 	}
 	
 	private OnClickListener onClickListener = new OnClickListener() {
@@ -117,64 +132,89 @@ public class MainActivity extends Activity {
         }
     };
     
+    // THIS IS MAIN APPLICATION WORKFLOW
     private void onActivityStateChange(ActivityState state) {
-        final String TAG = "MainActivity";
-        switch (state) {
+        final String TAG = "MainActivity.onActivityStateChange()";
+        
+        Log.i(TAG, "New state: " + String.valueOf(state) + ";  " + 
+                   "Old state: " + String.valueOf(mActivityState));
+        mActivityState = state;
+        switch (mActivityState) {
         case CREATED:
-            // check for internet access
-            if (NetworkManager.isOnline(this)) {
-                onActivityStateChange(ActivityState.CONNECTION_ESTABLISHED);
-            }
-            else {
-                Log.i(TAG, "No connection");
-                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which){
-                        case DialogInterface.BUTTON_POSITIVE:
-                            // try again
-                            onActivityStateChange(ActivityState.CREATED);
-                            break;
-                        case DialogInterface.BUTTON_NEGATIVE:
-                            // close application
-                            finish();
-                            break;
-                        }
-                    }
-                };
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setMessage(R.string.pleaseFindNetworkConnection)
-                       .setPositiveButton(R.string.tryAgain, dialogClickListener)
-                       .setNegativeButton(R.string.close, dialogClickListener)
-                       .show();
-            }
+            checkNetwork();
             break;
         case CONNECTION_ESTABLISHED:
-            Log.i(TAG, "Connection established");
-            // auth with Facebook
-            Session session = Session.getActiveSession();
-            if (session.isOpened() ||
-                session.getState().equals(SessionState.CREATED_TOKEN_LOADED))
-            {
-                Log.i(TAG, "We have correct session. User it.");
-                onSessionStateChange(Session.getActiveSession(), 
-                                     Session.getActiveSession().getState(), null);
-            }
-            else {
-                Log.i(TAG, "No correct session found. Create a new one.");
-                session = new Session(this);
-                OpenRequest openRequest = new OpenRequest(this);
-                openRequest.setPermissions(mPermissions);
-                openRequest.setCallback(callback);
-                Session.setActiveSession(session);
-                Session.getActiveSession().openForRead(openRequest);
-            }
+            loginWithFacebook();
             break;
         case FACEBOOK_SIGNED_IN:
-            Log.i(TAG, "Signed in with Facebook");
-            new ShowUserInfo().execute();
+            clearUserInfo();
+            retrieveUser();
             break;
+        case USER_RETRIEVED:
+            showUserInfo(mUserManager.getUser());
+            break;
+        }
+    }
+    
+    private void checkNetwork() {
+        final String TAG = "MainActivity.checkNetwork()";
+        
+        // check for network access
+        if (NetworkManager.isOnline(this)) {
+            Log.i(TAG, "Connection established");
+            onActivityStateChange(ActivityState.CONNECTION_ESTABLISHED);
+        }
+        else {
+            Log.i(TAG, "No connection");
+            DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    switch (which){
+                    case DialogInterface.BUTTON_POSITIVE:
+                        // try again
+                        onActivityStateChange(ActivityState.CREATED);
+                        break;
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        // close application
+                        finish();
+                        break;
+                    }
+                }
+            };
+            AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                   .setMessage(R.string.pleaseFindNetworkConnection)
+                   .setPositiveButton(R.string.tryAgain, dialogClickListener)
+                   .setNegativeButton(R.string.close, dialogClickListener)
+                   .setCancelable(false);
+            mAlertDialog = builder.show();
+        }
+    }
+    
+    private void loginWithFacebook() {
+        final String TAG = "MainActivity.loginWithFacebook()";
+        
+        // auth with Facebook
+        Session session = Session.getActiveSession();
+        if (session.isOpened() ||
+            session.getState().equals(SessionState.CREATED_TOKEN_LOADED))
+        {
+            Log.i(TAG, "We have correct session. Use it.");
+            onSessionStateChange(Session.getActiveSession(), 
+                                 Session.getActiveSession().getState(), null);
+        }
+        else if (session.getState().equals(SessionState.CLOSED_LOGIN_FAILED)) {
+            Log.i(TAG, "We have session with failed login.");
+            onSessionStateChange(Session.getActiveSession(), 
+                    Session.getActiveSession().getState(), null);
+        }
+        else {
+            Log.i(TAG, "No correct session found. Create a new one.");
+            session = new Session(this);
+            OpenRequest openRequest = new OpenRequest(this);
+            openRequest.setPermissions(mPermissions);
+            openRequest.setCallback(callback);
+            Session.setActiveSession(session);
+            Session.getActiveSession().openForRead(openRequest);
         }
     }
 	
@@ -200,79 +240,159 @@ public class MainActivity extends Activity {
                 }
             };
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage(R.string.pleaseLoginWithFacebook)
+            AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                   .setMessage(R.string.pleaseLoginWithFacebook)
                    .setPositiveButton(R.string.login, dialogClickListener)
-                   .setNegativeButton(R.string.close, dialogClickListener)
-                   .show();
+                   .setNegativeButton(R.string.close, dialogClickListener);
+            mAlertDialog = builder.show();
        }
     }
 	
-	private class ShowUserInfo extends AsyncTask<Void, Void, User> {
-        protected void onPreExecute() {
-           if (mUserManager.isUserCached() != true) {
-               // show progress dialog only if we're going to do
-               // some time consuming job: operate with DB or Facebook;
-               mProgress = new ProgressDialog(MainActivity.this);
-               mProgress.setMessage(getString(R.string.gettingUser));
-               mProgress.setOnCancelListener(new OnCancelListener() {
-                   public void onCancel(DialogInterface dialog) {
-                       cancel(false);
-                   }
-               });
-               mProgress.show();
-           }
+	private void retrieveUser() {
+	    if (mUserManager.isUserCached()) {
+            onActivityStateChange(ActivityState.USER_RETRIEVED);
+        }
+	    else {
+	        if (mRetrieveUserTask != null) {
+	            // we already have a task working 
+	            // which means activity was recreated
+	            // (after rotation or something)
+	            mRetrieveUserTask.setNewActivity(this);
+	            
+	        }
+	        else {
+	            mRetrieveUserTask = new RetrieveUserTask();
+	            mRetrieveUserTask.execute();
+	        }
+	    }
+	}
+	
+	private class RetrieveUserTask extends AsyncTask<Void, Void, User> {	    
+	    private InterruptListener taskExecutor;
+	    private MainActivity activity = MainActivity.this;
+	    private ProgressDialog progressDialog; 
+	    private boolean finished = false;
+        
+	    protected void onPreExecute() {
+	       final String TAG = "RetrieveUserTask.onPreExecute()";
+           
+	       Log.i(TAG, "Entering function");  
+           setupProgressDialog();
         }
         
         protected User doInBackground(Void...params) {
+            final String TAG = "RetrieveUserTask.doInBackground()";
+            
+            Log.i(TAG, "Entering function");
+            taskExecutor = mUserManager;
             return mUserManager.getUser();
         }
         
         protected void onPostExecute(User user) {
-            if (mProgress != null && mProgress.isShowing()) {
-                mProgress.cancel();
+            final String TAG = "RetrieveUserTask.onPostExecute()";
+            
+            Log.i(TAG, "Entering function");
+            if (progressDialog != null && progressDialog.isShowing()) {
+                progressDialog.dismiss();
             }
-            clearUserInfo();
-            if (user != null) {
-                // we have successfully got a user info
-                showUserInfo(user);
+            MainActivity.mRetrieveUserTask = null; // task completed its job
+            activity.checkUserRetrieved();
+        }
+        
+        protected void onCancelled() {
+            final String TAG = "RetrieveUserTask.onCancelled()";
+            
+            Log.i(TAG, "Interrupting task");
+            //taskExecutor.interrupt();
+            if (activity != null) {
+                activity.finish();
+            }
+        }
+        
+        private void setupProgressDialog() {
+            final String TAG = "RetrieveUserTask.setupProgressDialog()";
+            
+            Log.i(TAG, "Entering function");
+            progressDialog = new ProgressDialog(activity);
+            progressDialog.setMessage(getString(R.string.gettingUser));
+            progressDialog.setOnCancelListener(new OnCancelListener() {
+                public void onCancel(DialogInterface dialog) {
+                    RetrieveUserTask.this.cancel(false);
+                }
+            });
+            progressDialog.show();
+        }
+        
+        public void setNewActivity(MainActivity new_activity) {
+            final String TAG = "RetrieveUserTask.setNewActivity()";
+            
+            Log.i(TAG, "Entering function");
+            activity = new_activity;
+            if (finished) {
+                onPostExecute(null);
             }
             else {
-                // we couldn't get user info from DB or Facebook;
-                // this possible only theoretically in cases:
-                //      - connection gone during the request;
-                //      - connection considered as opened but doesn't work really;
-                //      - Facebook API changed;
-                
-                if (NetworkManager.isOnline(MainActivity.this)) {
-                    // this is NOT a connection problem;
-                    // ask user if he wants to try again or close the application
-                    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            switch (which){
-                            case DialogInterface.BUTTON_POSITIVE:
-                                // try again
-                                onActivityStateChange(ActivityState.FACEBOOK_SIGNED_IN);
-                                break;
-                            case DialogInterface.BUTTON_NEGATIVE:
-                                // close application
-                                finish();
-                                break;
-                            }
+                setupProgressDialog();
+            }
+        }
+        
+        public void detachActivity(){
+            final String TAG = "RetrieveUserTask.detachActivity()";
+            
+            Log.i(TAG, "Entering function");
+            activity = null;
+            if (progressDialog != null && progressDialog.isShowing()) {
+                progressDialog.dismiss();
+            }
+            progressDialog = null;
+        }
+        
+        public boolean isFinished() {
+            return finished;
+        }
+	}
+	
+	public void checkUserRetrieved() {
+	    if (mUserManager.isUserCached()) {
+            // we have successfully got a user info
+	        onActivityStateChange(ActivityState.USER_RETRIEVED);
+        }
+        else {
+            // we failed to get user info from DB or Facebook;
+            // this possible only theoretically in cases:
+            //      - connection gone during the request;
+            //      - connection considered as opened but doesn't work really;
+            //      - Facebook API changed or something alike;
+            
+            if (NetworkManager.isOnline(MainActivity.this)) {
+                // this is NOT a connection problem;
+                // ask user if he wants to try again or close the application
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which){
+                        case DialogInterface.BUTTON_POSITIVE:
+                            // try again
+                            onActivityStateChange(ActivityState.FACEBOOK_SIGNED_IN);
+                            break;
+                        case DialogInterface.BUTTON_NEGATIVE:
+                            // close application
+                            finish();
+                            break;
                         }
-                    };
-                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                    builder.setMessage(R.string.cannotGetUserInfo)
-                           .setPositiveButton(R.string.tryAgain, dialogClickListener)
-                           .setNegativeButton(R.string.close, dialogClickListener)
-                           .show();
-                }
-                else {
-                    // this IS a connection problem;
-                    // go back to previous state (before CONNECTION_ESTABLISHED)
-                    onActivityStateChange(ActivityState.CREATED);
-                }
+                    }
+                };  
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this)
+                       .setMessage(R.string.cannotGetUserInfo)
+                       .setPositiveButton(R.string.tryAgain, dialogClickListener)
+                       .setNegativeButton(R.string.close, dialogClickListener)
+                       .setCancelable(false);
+                mAlertDialog = builder.show();
+            }
+            else {
+                // this IS a connection problem;
+                // go back to connection checking state
+                onActivityStateChange(ActivityState.CREATED);
             }
         }
 	}
@@ -354,10 +474,19 @@ public class MainActivity extends Activity {
         super.onPause();
         uiHelper.onPause();
         
-        if (mProgress != null && mProgress.isShowing()) {
-            mProgress.cancel();
+        // free shown dialog, if any
+        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+            mProgressDialog.dismiss();
         }
-        mProgress = null;
+        mProgressDialog = null;
+        if (mAlertDialog != null && mAlertDialog.isShowing()) {
+            mAlertDialog.cancel();
+        }
+        mAlertDialog = null;
+        // detach activity from asyncTask
+        if (mRetrieveUserTask != null) {
+            mRetrieveUserTask.detachActivity();
+        }
     }
 
     @Override
@@ -376,5 +505,24 @@ public class MainActivity extends Activity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         uiHelper.onSaveInstanceState(outState);
+        outState.putString(ACTIVITY_STATE, mActivityState.toString());
+    }
+    
+    private void logKeyHash() {
+        try {
+            PackageInfo info = getPackageManager().getPackageInfo(
+                "com.uvs.coffeejob", PackageManager.GET_SIGNATURES
+            );
+            for (Signature signature : info.signatures) {
+                MessageDigest md = MessageDigest.getInstance("SHA");
+                md.update(signature.toByteArray());
+                Log.i("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
+            }
+        } catch (NameNotFoundException e) {
+            Log.i("KeyHash:", "NameNotFound");
+
+        } catch (NoSuchAlgorithmException e) {
+            Log.i("KeyHash:", "NoAlgo");
+        }
     }
 }

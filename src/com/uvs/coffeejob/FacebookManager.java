@@ -19,19 +19,35 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 
-public class FacebookManager {
+public class FacebookManager implements InterruptListener {
+    private volatile boolean mInterrupted = false;
+    
+    public void interrupt() {
+        mInterrupted = true;
+    }
+    
+    public boolean isInterrupted() {
+        return mInterrupted;
+    }
+    
     // makes a request only if session is already open;
     // otherwise return null
-    public static User getUser() {
+    public User getUser() {
         final String TAG = "FacebookManager.getUser()";
         Log.i(TAG, "Entering function");
         
         User user = null;
         Session session = Session.getActiveSession();
         if (session != null && session.isOpened()) {
+            // check if task is interrupted before we do any heavy job
+            if (isInterrupted()) {
+                Log.i(TAG, "Task is interrupted");
+                return null;
+            }
             Log.i(TAG, "Session is opened. Making request.");
             Response response = Request.executeAndWait(new Request(session, "me"));
             Log.i(TAG, "Response: \n" + response.toString());
+            
             GraphUser graphUser = response.getGraphObjectAs(GraphUser.class);
             if (graphUser != null) {
                 // parse Facebook graph
@@ -40,6 +56,10 @@ public class FacebookManager {
                 user.setSurname(graphUser.getLastName());
                 user.setBio((String) graphUser.getProperty("bio"));
                 
+                if (isInterrupted()) {
+                    Log.i(TAG, "Task is interrupted");
+                    return null;
+                }
                 // photo
                 Bitmap photo = null;
                 try {
@@ -54,7 +74,6 @@ public class FacebookManager {
                 }
                 user.setPhoto(photo);
                
-                
                 // birth date
                 GregorianCalendar birth;
                 try {
@@ -79,6 +98,10 @@ public class FacebookManager {
             }
         }
         
+        if (isInterrupted()) {
+            Log.i(TAG, "Task is interrupted");
+            return null;
+        }
         // TODO: override User.toString()
         Log.i(TAG, "Gotten user: \n" + String.valueOf(user));
         Log.i(TAG, "Leaving function");

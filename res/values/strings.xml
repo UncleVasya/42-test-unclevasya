@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">coffeejob</string>
-    <string name="app_id">593638047340260</string>
-    <string name="myName_caption">My name: </string>
-    <string name="myBio_caption"> My biography: </string>
-    <string name="myBirth_caption"> My birth date: </string>
-    <string name="myContacts_caption"> My contacts: </string>
-    <string name="userPhoto">User photo</string>
-    <string name="pleaseLoginWithFacebook">Please login with Facebook to use this application</string>
-    <string name="login">Login</string>
-    <string name="close">Close</string>
-    <string name="gettingUser">Getting user info...</string>
-    <string name="noData">No data</string>
-    <string name="signOutAndClose">Sign out and close application</string>
-    <string name="pleaseFindNetworkConnection">No network. Please find working Internet connection to use this application</string>
-    <string name="cannotGetUserInfo">Cannot get user info. Must be Network problem</string>
-    <string name="tryAgain">Try again</string>
+    <string name="app_name" translatable="false">coffeejob</string>
+    <string name="app_id" translatable="false">593638047340260</string>
+    <string name="myName_caption" translatable="false">My name: </string>
+    <string name="myBio_caption" translatable="false"> My biography: </string>
+    <string name="myBirth_caption" translatable="false"> My birth date: </string>
+    <string name="myContacts_caption" translatable="false"> My contacts: </string>
+    <string name="userPhoto" translatable="false">User photo</string>
+    <string name="pleaseLoginWithFacebook" translatable="false">Please login with Facebook to use this application</string>
+    <string name="login" translatable="false">Login</string>
+    <string name="close" translatable="false">Close</string>
+    <string name="gettingUser" translatable="false">Getting user info…</string>
+    <string name="noData" translatable="false">No data</string>
+    <string name="signOutAndClose" translatable="false">Sign out and close application</string>
+    <string name="pleaseFindNetworkConnection" translatable="false">No network. Please find working Internet connection to use this application</string>
+    <string name="cannotGetUserInfo" translatable="false">Cannot get user info. Must be Network problem</string>
+    <string name="tryAgain" translatable="false">Try again</string>
 </resources>
