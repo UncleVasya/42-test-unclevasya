@@ -22,6 +22,8 @@ public class UserManager implements InterruptListener {
 		mContext = context;
 		mDatabase = new DBManager(mContext);
 		mFacebookManager = new FacebookManager();
+		mInterrupted = false;
+		mUser = null;
 	}
 	
 	public static UserManager getInstance() {

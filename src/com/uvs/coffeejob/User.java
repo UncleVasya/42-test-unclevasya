@@ -37,12 +37,16 @@ public class User {
     
     @Override
     public boolean equals(Object obj) {
-        User user = (User) obj;
-        return (this.getName()      .equals(user.getName())      && 
-                this.getSurname()   .equals(user.getSurname())   &&
-                this.getBio()       .equals(user.getBio())       &&
-                this.getBirthDate() .equals(user.getBirthDate()) &&
-                this.getContacts()  .equals(user.getContacts()));
+        boolean result = false;
+        if (obj != null) {    
+            User user = (User) obj;
+            result = this.getName()      .equals(user.getName())      && 
+                     this.getSurname()   .equals(user.getSurname())   &&
+                     this.getBio()       .equals(user.getBio())       &&
+                     this.getBirthDate() .equals(user.getBirthDate()) &&
+                     this.getContacts()  .equals(user.getContacts());
+        }
+            return result;
     }
 	
 	// setters
