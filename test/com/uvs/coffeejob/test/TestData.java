@@ -4,22 +4,34 @@ import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+
+import com.uvs.coffeejob.R;
 import com.uvs.coffeejob.User;
 import com.uvs.coffeejob.UserContact;
 
 public class TestData {
+    private static final Activity activity = new Activity();
+    
     // DEFAULT USER
     public static final String DEFAULT_NAME    = "Oleg";
     public static final String DEFAULT_SURNAME = "Ovcharenko";
     public static final String DEFAULT_BIO     = "Nothing interesting here. " + 
                                                  "Just a man from Belogorsk.";
+    
     public static final GregorianCalendar DEFAULT_BIRTH = 
-            new GregorianCalendar               (1991, 00, 01);
+            new GregorianCalendar(1991, 00, 01);
+    
+    public static final Bitmap DEFAULT_PHOTO = BitmapFactory.decodeResource(
+            activity.getResources(), R.drawable.uvs_towel);
+    
     public static final List<UserContact> DEFAULT_CONTACTS = 
             new ArrayList<UserContact>(){{
-                add(                            getDefaultContact_1());
-                add(                            getDefaultContact_2());
-                add(                            getDefaultContact_3());
+                add(getDefaultContact_1());
+                add(getDefaultContact_2());
+                add(getDefaultContact_3());
     }};
     
     // DEFAULT USER CONTACTS
@@ -31,7 +43,7 @@ public class TestData {
     
     public static final String DEFAULT_CONTACT_3_TYPE    = "Phone";
     public static final String DEFAULT_CONTACT_3_VALUE   = "9379992";
- 
+    
     
     public static User getDefaultUser() {
         User user = new User();

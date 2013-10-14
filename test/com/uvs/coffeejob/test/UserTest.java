@@ -14,23 +14,20 @@ import com.uvs.coffeejob.UserContact;
 
 @RunWith(RobolectricTestRunner.class)
 public class UserTest {
-	final String DEFAULT_NAME    = "Oleg";
-	final String DEFAULT_SURNAME = "Ovcharenko";
-	final String DEFAULT_BIO     = "Nothing interesting here. " + 
-                                   "Just a man from Belogorsk.";
-	final GregorianCalendar DEFAULT_BIRTH = new GregorianCalendar(1991, 00, 01);
     
 	@Test
     public void test_UserSetters() {
         User user = new User();
-        user.setName(DEFAULT_NAME);
-        user.setSurname(DEFAULT_SURNAME);
-        user.setBio(DEFAULT_BIO);
-        user.setBirthDate(DEFAULT_BIRTH);
-        assertEquals(DEFAULT_NAME, user.getName());
-        assertEquals(DEFAULT_SURNAME, user.getSurname());
-        assertEquals(DEFAULT_BIO, user.getBio());
-        assertEquals(DEFAULT_BIRTH, user.getBirthDate());
+        user.setName(TestData.DEFAULT_NAME);
+        user.setSurname(TestData.DEFAULT_SURNAME);
+        user.setBio(TestData.DEFAULT_BIO);
+        user.setBirthDate(TestData.DEFAULT_BIRTH);
+        user.setPhoto(TestData.DEFAULT_PHOTO);
+        assertEquals(TestData.DEFAULT_NAME, user.getName());
+        assertEquals(TestData.DEFAULT_SURNAME, user.getSurname());
+        assertEquals(TestData.DEFAULT_BIO, user.getBio());
+        assertEquals(TestData.DEFAULT_BIRTH, user.getBirthDate());
+        assertEquals(TestData.DEFAULT_PHOTO, user.getPhoto());
     }
 	
 	@Test
