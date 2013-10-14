@@ -1,6 +1,7 @@
 package com.uvs.coffeejob.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import java.util.GregorianCalendar;
 
@@ -34,48 +35,28 @@ public class UserTest {
 	
 	@Test
     public void test_UserAddContact() {
-		final String CONTACT_1_TYPE    = "ICQ";
-		final String CONTACT_1_VALUE   = "1234567";
-		
-		final String CONTACT_2_TYPE    = "Jabber";
-		final String CONTACT_2_VALUE   = "uvs.jabber.org";
-		
         User user = new User();
-        assertEquals(0, user.getContacts().size());
+        assertNull(user.getContacts());
         
-        user.addContact(CONTACT_1_TYPE, CONTACT_1_VALUE);
+        user.addContact(TestData.DEFAULT_CONTACT_1_TYPE,
+                        TestData.DEFAULT_CONTACT_1_VALUE);
         assertEquals(1, user.getContacts().size());
         
-        UserContact contact = new UserContact(CONTACT_2_TYPE, CONTACT_2_VALUE);
-        user.addContact(contact);
+        user.addContact(TestData.getDefaultContact_2());
         assertEquals(2, user.getContacts().size());
         
-        
-        assertEquals(new UserContact(CONTACT_1_TYPE, CONTACT_1_VALUE),  
-                     user.getContacts().get(0));
-        assertEquals(new UserContact(CONTACT_2_TYPE, CONTACT_2_VALUE),  
-                user.getContacts().get(1));
+        assertEquals(TestData.getDefaultContact_1(), user.getContacts().get(0));
+        assertEquals(TestData.getDefaultContact_2(), user.getContacts().get(1));
     }
 	
 	@Test
     public void test_UserClearContacts() {
-		final String CONTACT_1_TYPE    = "ICQ";
-		final String CONTACT_1_VALUE   = "1234567";
-		
-		final String CONTACT_2_TYPE    = "Jabber";
-		final String CONTACT_2_VALUE   = "uvs.jabber.org";
-		
         User user = new User();
         
-        user.addContact(CONTACT_1_TYPE, CONTACT_1_VALUE);
-        user.addContact(CONTACT_2_TYPE, CONTACT_2_VALUE);
-        assertEquals(2, user.getContacts().size());
-        
-        user.clearContacts();
-        assertEquals(0, user.getContacts().size());
-        
-        user.addContact(CONTACT_1_TYPE, CONTACT_1_VALUE);
-        assertEquals(1, user.getContacts().size());
+        user.addContact(TestData.getDefaultContact_1());
+        user.addContact(TestData.getDefaultContact_2());
+        user.addContact(TestData.getDefaultContact_3());
+        assertEquals(3, user.getContacts().size());
         
         user.clearContacts();
         assertEquals(0, user.getContacts().size());

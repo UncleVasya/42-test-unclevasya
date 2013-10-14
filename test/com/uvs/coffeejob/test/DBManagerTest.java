@@ -1,6 +1,7 @@
 package com.uvs.coffeejob.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import java.util.List;
 
@@ -10,10 +11,11 @@ import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 
+import android.app.Activity;
+
 import com.uvs.coffeejob.DBManager;
 import com.uvs.coffeejob.MainActivity;
 import com.uvs.coffeejob.User;
-import com.uvs.coffeejob.UserManager;
 
 @RunWith(RobolectricTestRunner.class)
 public class DBManagerTest {
@@ -21,12 +23,11 @@ public class DBManagerTest {
     
     @Before
     public void setUp() {
-        MainActivity context = Robolectric.buildActivity(MainActivity.class).create().get();
-        mDatabase = new DBManager(context);
+        mDatabase = new DBManager(new Activity());
     }
     @Test 
     public void test_ClearDB() {
-        mDatabase.addUser(UserManager.getDefaultUser());
+        mDatabase.addUser(TestData.getDefaultUser());
         mDatabase.clearDB();
         assertEquals(0, mDatabase.getUsers().size());
     }
@@ -35,15 +36,15 @@ public class DBManagerTest {
 	public void test_AddUser() {
 	    mDatabase.clearDB();
 	    for (int i=1; i<10; ++i) {
-	        mDatabase.addUser(UserManager.getDefaultUser());
+	        mDatabase.addUser(TestData.getDefaultUser());
 	        assertEquals(i, mDatabase.getUsers().size());
 	    }
 	}
 	
 	@Test
 	public void test_GetUsers() {
-		User user1 = UserManager.getDefaultUser();
-		User user2 = UserManager.getDefaultUser();
+		User user1 = TestData.getDefaultUser();
+		User user2 = TestData.getDefaultUser();
 		user2.setName("Vasya");
 		
 		mDatabase.clearDB();

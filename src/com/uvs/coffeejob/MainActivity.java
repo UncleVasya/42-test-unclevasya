@@ -509,20 +509,28 @@ public class MainActivity extends Activity {
     }
     
     private void logKeyHash() {
+        final String TAG = "logKeyHash()";
         try {
             PackageInfo info = getPackageManager().getPackageInfo(
                 "com.uvs.coffeejob", PackageManager.GET_SIGNATURES
             );
-            for (Signature signature : info.signatures) {
+            for (Signature signature: info.signatures) {
                 MessageDigest md = MessageDigest.getInstance("SHA");
-                md.update(signature.toByteArray());
-                Log.i("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
+                    md.update(signature.toByteArray());
+                Log.i(TAG, "KeyHash:" +
+                        Base64.encodeToString(md.digest(), Base64.DEFAULT));
             }
-        } catch (NameNotFoundException e) {
+        } 
+        catch (NameNotFoundException e) {
             Log.i("KeyHash:", "NameNotFound");
-
-        } catch (NoSuchAlgorithmException e) {
+        }
+        catch (NoSuchAlgorithmException e) {
             Log.i("KeyHash:", "NoAlgo");
         }
+        catch (NullPointerException e) {
+            Log.i(TAG, "NullPonterException  " + 
+                       "SHOULD HAPPEN ONLY UNDER ROBOLECTRIC");
+        }
+        
     }
 }
