@@ -303,7 +303,7 @@ public class MainActivity extends Activity {
             final String TAG = "RetrieveUserTask.onCancelled()";
             
             Log.i(TAG, "Interrupting task");
-            //taskExecutor.interrupt();
+            taskExecutor.interrupt();
             if (activity != null) {
                 activity.finish();
             }
