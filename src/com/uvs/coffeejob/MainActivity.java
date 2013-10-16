@@ -6,6 +6,8 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+
+import com.actionbarsherlock.app.SherlockActivity;
 import com.facebook.Session;
 import com.facebook.Session.OpenRequest;
 import com.facebook.SessionState;
@@ -31,7 +33,7 @@ import android.widget.ImageView;
 import android.widget.TabHost;
 import android.widget.TextView;
 
-public class MainActivity extends Activity {
+public class MainActivity extends SherlockActivity {
 	private UserManager mUserManager;
 	private TextView    mUserName;
 	private TextView    mUserBio;

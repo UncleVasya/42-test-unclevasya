@@ -17,4 +17,11 @@
     <string name="pleaseFindNetworkConnection" translatable="false">No network. Please find working Internet connection to use this application</string>
     <string name="cannotGetUserInfo" translatable="false">Cannot get user info. Must be Network problem</string>
     <string name="tryAgain" translatable="false">Try again</string>
+    <string name="title_activity_edit_user">Edit user info</string>
+    <string name="action_settings">Settings</string>
+    <string name="mySurname_caption">My surname:</string>
+    <string name="selectDate_caption">Select date</string>
+    <string name="addContact_caption">Add contact</string>
+    <string name="save">Save</string>
+
 </resources>
