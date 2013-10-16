@@ -5,14 +5,14 @@
     android:orientation="horizontal" >
 
     <EditText
-        android:id="@+id/editText2"
+        android:id="@+id/contactTypeEdit"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:ems="10" />
 
     <EditText
-        android:id="@+id/editText1"
+        android:id="@+id/contactValueEdit"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
@@ -22,9 +22,9 @@
     </EditText>
 
     <Button
-        android:id="@+id/button1"
+        android:id="@+id/deleteContactButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Delete" />
+        android:text="@string/Delete" />
 
 </LinearLayout>

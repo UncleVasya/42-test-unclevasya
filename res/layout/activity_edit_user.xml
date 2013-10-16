@@ -70,7 +70,7 @@
                 android:layout_weight="1" />
 
             <Button
-                android:id="@+id/buttonSelectDate"
+                android:id="@+id/selectDateButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/selectDate_caption" />
@@ -117,7 +117,7 @@
         </ListView>
 
         <Button
-            android:id="@+id/button1"
+            android:id="@+id/deleteContactButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="0"
