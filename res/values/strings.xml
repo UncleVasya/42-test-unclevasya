@@ -24,4 +24,5 @@
     <string name="addContact_caption">Add contact</string>
     <string name="save">Save</string>
     <string name="Delete">Delete</string>
+    <string name="Cancel">Cancel</string>
 </resources>
