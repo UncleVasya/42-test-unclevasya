@@ -6,8 +6,10 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 
-import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.facebook.Session;
 import com.facebook.Session.OpenRequest;
 import com.facebook.SessionState;
@@ -16,6 +18,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.support.v4.app.FragmentManager;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
@@ -33,16 +36,9 @@ import android.widget.ImageView;
 import android.widget.TabHost;
 import android.widget.TextView;
 
-public class MainActivity extends SherlockActivity {
-	private UserManager mUserManager;
-	private TextView    mUserName;
-	private TextView    mUserBio;
-	private TextView    mUserBirth;
-	private TextView    mUserContacts;
-	private ImageView   mUserPhoto;
-	private Button      mCloseBtn;
-	private TabHost     mTabs;
-	
+public class MainActivity extends SherlockFragmentActivity {
+	private UserManager mUserManager = UserManager.getInstance();
+		
 	private AlertDialog      mAlertDialog;
 	private ProgressDialog   mProgressDialog;
 	
@@ -79,19 +75,10 @@ public class MainActivity extends SherlockActivity {
 	    logKeyHash();
 	    
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+		setContentView(R.layout.main_activity);
+		//setContentView(R.layout.activity_main);
 		uiHelper      = new UiLifecycleHelper(this, callback);
         uiHelper.onCreate(savedInstanceState);
-        mTabs         = (TabHost)findViewById(R.id.Tabhost);
-		mUserName     = (TextView) findViewById(R.id.userNameText);
-		mUserBio      = (TextView) findViewById(R.id.userBioText);
-		mUserBirth    = (TextView) findViewById(R.id.userBirthText);
-		mUserContacts = (TextView) findViewById(R.id.userContactsText);
-		mUserPhoto    = (ImageView)findViewById(R.id.userPhotoView);
-		mUserManager  = UserManager.getInstance();
-		mCloseBtn     = (Button)   findViewById(R.id.closeButton);
-		mCloseBtn.setOnClickListener(onClickListener);
-		setupTabs();
 		
 		Log.i(TAG, Session.getActiveSession().toString()); 
 		if(savedInstanceState == null) {
@@ -105,19 +92,6 @@ public class MainActivity extends SherlockActivity {
 		    String state_str = savedInstanceState.getString(ACTIVITY_STATE);
 		    onActivityStateChange(ActivityState.valueOf(state_str));
 		}
-	}
-	
-	private void setupTabs() {
-	    mTabs.setup();
-        TabHost.TabSpec spec = mTabs.newTabSpec("tag1");
-        spec.setContent(R.id.tab1);
-        spec.setIndicator("User info");
-        mTabs.addTab(spec);
-        spec = mTabs.newTabSpec("tag2");
-        spec.setContent(R.id.tab2);
-        spec.setIndicator("Empty tab");
-        mTabs.addTab(spec);
-        mTabs.setCurrentTab(0);
 	}
 	
 	private OnClickListener onClickListener = new OnClickListener() {
@@ -149,11 +123,15 @@ public class MainActivity extends SherlockActivity {
             loginWithFacebook();
             break;
         case FACEBOOK_SIGNED_IN:
-            clearUserInfo();
             retrieveUser();
             break;
         case USER_RETRIEVED:
-            showUserInfo(mUserManager.getUser());
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            if (fragmentManager.getFragments() == null) { // don't recreate on rotation
+                Fragment newFragment = new ShowUserFragment();
+                FragmentTransaction ft = fragmentManager.beginTransaction();
+                ft.add(R.id.main_frame, newFragment).commit();
+            }
             break;
         }
     }
@@ -397,72 +375,6 @@ public class MainActivity extends SherlockActivity {
                 onActivityStateChange(ActivityState.CREATED);
             }
         }
-	}
-	
-	private void showUserInfo(User user) {
-	    // user name
-	    String str = getString(R.string.noData);
-	    if (user.getName() != null && user.getSurname() != null) {
-	        str = user.getName() + " " + user.getSurname();
-	    }
-	    mUserName.setText(str);
-	    
-	    // user bio
-	    str = getString(R.string.noData);
-	    if (user.getBio() != null) {
-	        str = user.getBio();
-	    }
-        mUserBio.setText(str);
-        
-        // user birth date
-        str = userBirthToStr(user);
-        if (str == null) {
-            str = getString(R.string.noData);
-        }
-        mUserBirth.setText(str);
-        
-        // user photo
-        mUserPhoto.setImageBitmap(user.getPhoto());
-        
-        // user contacts
-        str = userContactsToStr(user);
-        if (str == null) {
-            str = getString(R.string.noData);
-        }
-        mUserContacts.setText(str);
-	}
-	
-	private String userBirthToStr(User user) {
-	    String result = null;
-	    if (user.getBirthDate() != null) {
-    		SimpleDateFormat format = new SimpleDateFormat("MMMM dd, yyyy", Locale.US);
-    		result = format.format(user.getBirthDate().getTime());
-	    }
-	    return result;
-	}
-	
-	private String userContactsToStr(User user) {
-	    String result = null;
-        if (user.getContacts() != null) {
-            StringBuilder str_contacts = new StringBuilder();
-        	List<UserContact> contacts = user.getContacts();
-        	UserContact contact = contacts.get(0);
-        	str_contacts.append(contact.getType() + ": " + contact.getValue());
-            for (int i=1; i<user.getContacts().size(); ++i) {
-            	contact = contacts.get(i);
-            	str_contacts.append("\n" + contact.getType() + ": " + contact.getValue());
-            }
-            result = str_contacts.toString();
-        }
-        return result;
-	}
-	
-	private void clearUserInfo() {
-		mUserName.setText(null);
-		mUserBio.setText(null);
-		mUserBirth.setText(null);
-		mUserPhoto.setImageBitmap(null);
-		mUserContacts.setText(null);
 	}
 	
 	@Override
