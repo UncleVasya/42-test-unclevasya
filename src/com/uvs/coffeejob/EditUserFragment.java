@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
+import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 
 import android.os.Bundle;
@@ -19,9 +20,14 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
@@ -30,16 +36,21 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class EditUserActivity extends SherlockFragmentActivity {
+public class EditUserFragment extends    SherlockFragment
+                              implements CalendarWidget.OnDataSelectedListener
+{
     private EditText mNameEdit;
     private EditText mSurnameEdit;
     private EditText mBioEdit;
     private EditText mContactsEdit;
     private EditText mBirthDateEdit;
-    private ListView mContactsList;
     private Button   mSelectDateButton;
     private Button   mSaveButton;
     private Button   mCancelButton;
+    
+    private Activity            mParent;
+    private FragmentManager     mFrManager;
+    private static GregorianCalendar mCurrentBirth;
     
     private UserManager mUserManager = UserManager.getInstance();
     
@@ -47,23 +58,36 @@ public class EditUserActivity extends SherlockFragmentActivity {
             new SimpleDateFormat("MMMM dd, yyyy", Locale.US);
     
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_edit_user);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) 
+    {
+        View view = inflater.inflate(R.layout.edit_user_fragment, container, false);
+        setHasOptionsMenu(false);
         
-        mNameEdit         = (EditText)findViewById(R.id.name_edit);
-        mSurnameEdit      = (EditText)findViewById(R.id.surname_edit);
-        mBioEdit          = (EditText)findViewById(R.id.bio_edit);
-        mContactsEdit     = (EditText)findViewById(R.id.contacts_edit);
-        mBirthDateEdit    = (EditText)findViewById(R.id.birthDateEdit);
-        mSelectDateButton = (Button)findViewById(R.id.selectDateButton);
-        mSaveButton       = (Button)findViewById(R.id.save_button);
+        Log.i("onCreateView", "I'm here");
+        Log.i("onCreateView", "fragment: " + this);
+        mNameEdit         = (EditText)view.findViewById(R.id.name_edit);
+        mSurnameEdit      = (EditText)view.findViewById(R.id.surname_edit);
+        mBioEdit          = (EditText)view.findViewById(R.id.bio_edit);
+        mContactsEdit     = (EditText)view.findViewById(R.id.contacts_edit);
+        mBirthDateEdit    = (EditText)view.findViewById(R.id.birthDateEdit);
+        mSelectDateButton = (Button)  view.findViewById(R.id.select_date_button);
+        mSaveButton       = (Button)  view.findViewById(R.id.save_button);
         mSaveButton.setOnClickListener(mOnClickListener);
-        mCancelButton     = (Button)findViewById(R.id.cancel_button);
+        mCancelButton     = (Button)  view.findViewById(R.id.cancel_button);
         mCancelButton.setOnClickListener(mOnClickListener);
+        mSelectDateButton = (Button)  view.findViewById(R.id.select_date_button);
+        mSelectDateButton.setOnClickListener(mOnClickListener);
         
-        mUserManager.init(this);
+        mParent = getActivity();
+        mFrManager = getActivity().getSupportFragmentManager();
         
+        return view;
+    }
+    
+    @Override
+    public void onStart() {
+        super.onStart();
         showUser();
     }
     
@@ -71,27 +95,55 @@ public class EditUserActivity extends SherlockFragmentActivity {
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.save_button:
-                    updateUserInfo();
+                    boolean success = updateUserInfo();
+                    if (success) {
+                        mFrManager.popBackStack();
+                    }
+                    break;
+                case R.id.cancel_button:
+                    mFrManager.popBackStack();
+                    break;
+                case R.id.select_date_button:
+                    // show calendar widget
+                    Fragment newFragment = 
+                        CalendarWidget.newInstance(parseBirthEditToCalendar(),
+                                                   EditUserFragment.this);
+                    FragmentTransaction transaction = mFrManager.beginTransaction();
+                    transaction.replace(R.id.main_frame, newFragment)
+                               .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                               .addToBackStack(null)
+                               .commit();
                     break;
             }
        }
     };
     
+    public void onDataSelected(GregorianCalendar calendar) {
+        mCurrentBirth = calendar;
+    }
+
     private void showUser() {
+        Log.i("showUser", "I'm here");
         User user = mUserManager.getUser();
         
         mNameEdit.setText(user.getName());
         mSurnameEdit.setText(user.getSurname());
         mBioEdit.setText(user.getBio());
-        mBirthDateEdit.setText(userBirthToStr(user));
+        Log.i("showUser", "mCurrentBirth: " + mCurrentBirth);
+        if (mCurrentBirth != null) { // returned from Calendar widget
+            mBirthDateEdit.setText(CalendarToStr(mCurrentBirth));
+        }
+        else {
+            mBirthDateEdit.setText(CalendarToStr(user.getBirthDate()));
+        }
+        Log.i("showUser", "mBirthDateText" + mBirthDateEdit.getText().toString());
         mContactsEdit.setText(userContactsToStr(user));
     }
     
-    private String userBirthToStr(User user) {
+    private String CalendarToStr(GregorianCalendar calendar) {
         String result = null;
-        if (user.getBirthDate() != null) {
-            SimpleDateFormat format = new SimpleDateFormat("MMMM dd, yyyy", Locale.US);
-            result = format.format(user.getBirthDate().getTime());
+        if (calendar != null) {
+            result = DATE_FORMAT.format(calendar.getTime());
         }
         return result;
     }
@@ -112,28 +164,29 @@ public class EditUserActivity extends SherlockFragmentActivity {
         return result;
     }
     
-    public void updateUserInfo() {
+    public boolean updateUserInfo() {
         final String TAG = "EditUserActivity.updateUserInfo()";
         
+        boolean success = false;
         // data validation
         if (mNameEdit.getText().length() <= 0) {
-            Toast.makeText(this, "Please tell me your name", 
+            Toast.makeText(mParent, "Please tell me your name", 
                            Toast.LENGTH_LONG)
                  .show();
         }
         else if (mSurnameEdit.getText().length() <= 0) {
-            Toast.makeText(this, "I'm curious of your surname", 
+            Toast.makeText(mParent, "I'm curious of your surname", 
                            Toast.LENGTH_LONG)
                  .show();
         }
         else if (mBioEdit.getText().length() <= 0) {
-            Toast.makeText(this, "What's about you biography?", 
+            Toast.makeText(mParent, "What's about you biography?", 
                            Toast.LENGTH_LONG)
                  .show();
         }
         else if (isValidBirth() && isValidContactsData()) {
             // all checks passed - data is valid
-            User user = new User();
+            User user = mUserManager.getUser();
             user.setName(mNameEdit.getText().toString());
             user.setSurname(mSurnameEdit.getText().toString());
             user.setBio(mBioEdit.getText().toString());
@@ -143,6 +196,7 @@ public class EditUserActivity extends SherlockFragmentActivity {
             user.setBirthDate(parseBirthEditToCalendar());   
             
             // set contacts
+            user.clearContacts();
             Log.i(TAG, "Parsing contacts view");
             Log.i(TAG, "Full text: " + mContactsEdit.getText().toString() + "\n\n");
             String[] lines = mContactsEdit.getText().toString().split("[\\r\\n]+");
@@ -152,9 +206,10 @@ public class EditUserActivity extends SherlockFragmentActivity {
                 Log.i(TAG, "type:" + data[0] + "\nvalue:" + data[1] + "\n\n");
                 user.addContact(data[0], data[1]);
             }
-            
             mUserManager.setUser(user);
+            success = true;
         }
+        return success;
     }
     
     private boolean isValidBirth() {
@@ -166,13 +221,13 @@ public class EditUserActivity extends SherlockFragmentActivity {
             result = false; // should never happen
         }
         else if (birth.get(Calendar.YEAR) < MIN_VALID_YEAR) {
-            Toast.makeText(this, "Don't try to trick me. You can't be so old!", 
+            Toast.makeText(mParent, "Don't try to trick me. You can't be so old!", 
                     Toast.LENGTH_LONG)
                  .show();
             result = false;
         }
         else if (birth.get(Calendar.YEAR) == Calendar.getInstance().get(Calendar.YEAR)) {
-            Toast.makeText(this, "Wow, you've got a Time machine? I bet you was born earlier!", 
+            Toast.makeText(mParent, "Wow, you've got a Time machine? I bet you was born earlier!", 
                     Toast.LENGTH_LONG)
                  .show();
             result = false;
@@ -218,8 +273,8 @@ public class EditUserActivity extends SherlockFragmentActivity {
             }
         }
         if (result != true) {
-            Toast.makeText(this, "Ooopse, something's wron with your contacts.", 
-                    Toast.LENGTH_LONG)
+            Toast.makeText(mParent, "Ooopse, something's wron with your contacts.", 
+                           Toast.LENGTH_LONG)
                  .show(); 
         }
         return result;

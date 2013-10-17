@@ -7,6 +7,8 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 
+import android.app.Activity;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -23,22 +25,39 @@ import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
 
-public class CalendarFragment extends SherlockFragment {
+@SuppressWarnings("unused")
+public class CalendarWidget extends SherlockFragment {
+    private Button mCancelButton;
     private Button calendarHeader;
     private ImageView prevMonth;
     private ImageView nextMonth;
     private GridView calendarView;
     private CalendarAdapter adapter;
     private GregorianCalendar _calendar;
+    
     private int month, year;
     
+    private android.support.v4.app.FragmentManager mFrManager;
+    private OnDataSelectedListener mCallback;
+    
    
+    static CalendarWidget newInstance(GregorianCalendar calendar, 
+                                      Object callback)
+    {
+        CalendarWidget fragment = new CalendarWidget();
+        fragment._calendar = calendar;
+        fragment.mCallback = (OnDataSelectedListener) callback;
+        return fragment;
+    }
+    
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.calendar_widget, container, false);
         
-        _calendar = (GregorianCalendar) GregorianCalendar.getInstance(Locale.US);
+        if (_calendar == null) {
+            _calendar = (GregorianCalendar) GregorianCalendar.getInstance(Locale.US);
+        }
         month = _calendar.get(Calendar.MONTH);
         year = _calendar.get(Calendar.YEAR);
 
@@ -46,7 +65,6 @@ public class CalendarFragment extends SherlockFragment {
         prevMonth.setOnClickListener(onClickListener);
 
         calendarHeader = (Button) view.findViewById(R.id.calendarHeader);
-        Log.i("bla", calendarHeader.toString());
         SimpleDateFormat format = new SimpleDateFormat("MMMM dd, yyyy", Locale.US);
         calendarHeader.setText(format.format(_calendar.getTime()));
 
@@ -60,8 +78,19 @@ public class CalendarFragment extends SherlockFragment {
         adapter.notifyDataSetChanged();
         calendarView.setAdapter(adapter);
         
+        mCancelButton = (Button) view.findViewById(R.id.cancel_button);
+        mCancelButton.setOnClickListener(mOnCancelClickListener);
+        
+        mFrManager = getActivity().getSupportFragmentManager();
+        
         return view;
     }
+    
+    private OnClickListener mOnCancelClickListener = new OnClickListener() {
+        public void onClick(View v) {
+            mFrManager.popBackStack();
+       }
+    };
     
     private OnClickListener onClickListener = new OnClickListener() {
         @Override
@@ -96,6 +125,11 @@ public class CalendarFragment extends SherlockFragment {
             calendarHeader.setText(format.format(_calendar.getTime()));
         }
     };
+    
+    public interface OnDataSelectedListener {
+        public void onDataSelected(GregorianCalendar calendar);
+    }
+
 
     public class CalendarAdapter extends BaseAdapter implements OnClickListener {
         private final Context _context;
@@ -165,6 +199,9 @@ public class CalendarFragment extends SherlockFragment {
             calendarHeader.setText(format.format(_calendar.getTime()));
             adapter.notifyDataSetChanged();
             calendarView.setAdapter(adapter);
+            // return new date to listener
+            mCallback.onDataSelected(_calendar);
+            mFrManager.popBackStack();
         }
     }
 }

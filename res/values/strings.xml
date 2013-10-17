@@ -25,4 +25,6 @@
     <string name="save">Save</string>
     <string name="Delete">Delete</string>
     <string name="Cancel">Cancel</string>
+    <string name="Edit">Edit</string>
+    <string name="About">About</string>
 </resources>

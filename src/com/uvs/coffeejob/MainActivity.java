@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Locale;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-
+import android.support.v4.app.FragmentManager;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.facebook.Session;
 import com.facebook.Session.OpenRequest;
@@ -18,7 +18,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.support.v4.app.FragmentManager;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
@@ -129,8 +128,8 @@ public class MainActivity extends SherlockFragmentActivity {
             FragmentManager fragmentManager = getSupportFragmentManager();
             if (fragmentManager.getFragments() == null) { // don't recreate on rotation
                 Fragment newFragment = new ShowUserFragment();
-                FragmentTransaction ft = fragmentManager.beginTransaction();
-                ft.add(R.id.main_frame, newFragment).commit();
+                FragmentTransaction transaction = fragmentManager.beginTransaction();
+                transaction.add(R.id.main_frame, newFragment).commit();
             }
             break;
         }

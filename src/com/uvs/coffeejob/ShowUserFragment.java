@@ -7,10 +7,16 @@ import java.util.List;
 import java.util.Locale;
 
 import com.actionbarsherlock.app.SherlockFragment;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 import com.facebook.Session;
-import com.uvs.coffeejob.CalendarFragment.CalendarAdapter;
+import com.uvs.coffeejob.CalendarWidget.CalendarAdapter;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +26,7 @@ import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class ShowUserFragment extends SherlockFragment{
     private TextView    mUserName;
@@ -29,15 +36,16 @@ public class ShowUserFragment extends SherlockFragment{
     private ImageView   mUserPhoto;
     private Button      mCloseBtn;
     
-    private UserManager mUserManager = UserManager.getInstance(); 
-    
-    private UserManager mUserManaer = UserManager.getInstance();
+    private UserManager mUserManager = UserManager.getInstance();
+    private FragmentManager mFrManager; 
+   
     
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) 
     {
         View view = inflater.inflate(R.layout.show_user_fragment, container, false);
+        setHasOptionsMenu(true);
         
         mUserName     = (TextView) view.findViewById(R.id.userNameText);
         mUserBio      = (TextView) view.findViewById(R.id.userBioText);
@@ -47,10 +55,45 @@ public class ShowUserFragment extends SherlockFragment{
         mCloseBtn     = (Button)   view.findViewById(R.id.closeButton);
         mCloseBtn.setOnClickListener(onClickListener);
         
+        mFrManager = getActivity().getSupportFragmentManager();
+        
         clearUserInfo();
         showUserInfo(mUserManager.getUser());
         
         return view;
+    }
+    
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        menu.add(0, R.id.menu_edit_user, 0, R.string.Edit)
+            .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        menu.add(0, R.id.menu_about_myself, 0, R.string.About)
+            .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home || item.getItemId() == 0) {
+            return false;
+        }
+        switch (item.getItemId()) {
+        case R.id.menu_edit_user:
+            Fragment edFragment = new EditUserFragment();
+            FragmentTransaction transaction = mFrManager.beginTransaction();
+            transaction.replace(R.id.main_frame, edFragment)
+                       .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                       .addToBackStack(null)
+                       .commit();
+            break;
+        case R.id.menu_about_myself:
+            Fragment abFragment = new AboutMyselfFragment();
+            FragmentTransaction t = mFrManager.beginTransaction();
+            t.replace(R.id.main_frame, abFragment);
+            t.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+            t.addToBackStack(null);
+            t.commit();
+        } 
+        return true;
     }
     
     private OnClickListener onClickListener = new OnClickListener() {
@@ -61,6 +104,8 @@ public class ShowUserFragment extends SherlockFragment{
                     if (session != null) {
                         session.closeAndClearTokenInformation();
                     }
+                    DBManager db = new DBManager(getActivity());
+                    db.clearDB();
                     ShowUserFragment.this.getActivity().finish();
                     break;
             }
@@ -90,9 +135,9 @@ public class ShowUserFragment extends SherlockFragment{
         mUserBirth.setText(str);
         
         // user photo
-        //if (user.getPhoto() != null) {
+        if (user.getPhoto() != null) {
             mUserPhoto.setImageBitmap(user.getPhoto());
-        //}
+        }
         
         // user contacts
         str = userContactsToStr(user);
