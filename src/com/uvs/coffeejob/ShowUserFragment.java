@@ -1,8 +1,6 @@
 package com.uvs.coffeejob;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 
@@ -11,22 +9,17 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.facebook.Session;
-import com.uvs.coffeejob.CalendarWidget.CalendarAdapter;
-
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.FragmentManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class ShowUserFragment extends SherlockFragment{
     private TextView    mUserName;
@@ -97,6 +90,7 @@ public class ShowUserFragment extends SherlockFragment{
     }
     
     private OnClickListener onClickListener = new OnClickListener() {
+        @Override
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.closeButton:

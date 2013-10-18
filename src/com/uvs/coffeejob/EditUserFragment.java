@@ -2,38 +2,25 @@ package com.uvs.coffeejob;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
 import com.actionbarsherlock.app.SherlockFragment;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.SimpleAdapter;
-import android.widget.TextView;
 import android.widget.Toast;
 
 public class EditUserFragment extends    SherlockFragment
@@ -92,6 +79,7 @@ public class EditUserFragment extends    SherlockFragment
     }
     
     private OnClickListener mOnClickListener = new OnClickListener() {
+        @Override
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.save_button:
@@ -118,6 +106,7 @@ public class EditUserFragment extends    SherlockFragment
        }
     };
     
+    @Override
     public void onDataSelected(GregorianCalendar calendar) {
         mCurrentBirth = calendar;
     }
@@ -170,17 +159,17 @@ public class EditUserFragment extends    SherlockFragment
         boolean success = false;
         // data validation
         if (mNameEdit.getText().length() <= 0) {
-            Toast.makeText(mParent, "Please tell me your name", 
+            Toast.makeText(mParent, R.string.msgNoName, 
                            Toast.LENGTH_LONG)
                  .show();
         }
         else if (mSurnameEdit.getText().length() <= 0) {
-            Toast.makeText(mParent, "I'm curious of your surname", 
+            Toast.makeText(mParent, R.string.msgNoSurname, 
                            Toast.LENGTH_LONG)
                  .show();
         }
         else if (mBioEdit.getText().length() <= 0) {
-            Toast.makeText(mParent, "What's about you biography?", 
+            Toast.makeText(mParent, R.string.msgNoBio, 
                            Toast.LENGTH_LONG)
                  .show();
         }
@@ -221,13 +210,13 @@ public class EditUserFragment extends    SherlockFragment
             result = false; // should never happen
         }
         else if (birth.get(Calendar.YEAR) < MIN_VALID_YEAR) {
-            Toast.makeText(mParent, "Don't try to trick me. You can't be so old!", 
+            Toast.makeText(mParent, R.string.msgTooOld, 
                     Toast.LENGTH_LONG)
                  .show();
             result = false;
         }
         else if (birth.get(Calendar.YEAR) == Calendar.getInstance().get(Calendar.YEAR)) {
-            Toast.makeText(mParent, "Wow, you've got a Time machine? I bet you was born earlier!", 
+            Toast.makeText(mParent, R.string.msgTooYoung, 
                     Toast.LENGTH_LONG)
                  .show();
             result = false;

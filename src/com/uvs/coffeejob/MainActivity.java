@@ -2,10 +2,8 @@ package com.uvs.coffeejob;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.FragmentManager;
@@ -16,7 +14,6 @@ import com.facebook.SessionState;
 import com.facebook.UiLifecycleHelper;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -28,12 +25,6 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.Signature;
 import android.util.Base64;
 import android.util.Log;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TabHost;
-import android.widget.TextView;
 
 public class MainActivity extends SherlockFragmentActivity {
 	private UserManager mUserManager = UserManager.getInstance();
@@ -92,20 +83,6 @@ public class MainActivity extends SherlockFragmentActivity {
 		    onActivityStateChange(ActivityState.valueOf(state_str));
 		}
 	}
-	
-	private OnClickListener onClickListener = new OnClickListener() {
-        public void onClick(View v) {
-            switch (v.getId()) {
-                case R.id.closeButton:
-                    Session session = Session.getActiveSession();
-                    if (session != null) {
-                        session.closeAndClearTokenInformation();
-                    }
-                    MainActivity.this.finish();
-                    break;
-            }
-        }
-    };
     
     // THIS IS MAIN APPLICATION WORKFLOW
     private void onActivityStateChange(ActivityState state) {
@@ -252,13 +229,15 @@ public class MainActivity extends SherlockFragmentActivity {
 	    private ProgressDialog progressDialog; 
 	    private boolean finished = false;
         
-	    protected void onPreExecute() {
+	    @Override
+        protected void onPreExecute() {
 	       final String TAG = "RetrieveUserTask.onPreExecute()";
            
 	       Log.i(TAG, "Entering function");  
            setupProgressDialog();
         }
         
+        @Override
         protected User doInBackground(Void...params) {
             final String TAG = "RetrieveUserTask.doInBackground()";
             
@@ -267,6 +246,7 @@ public class MainActivity extends SherlockFragmentActivity {
             return mUserManager.getUser();
         }
         
+        @Override
         protected void onPostExecute(User user) {
             final String TAG = "RetrieveUserTask.onPostExecute()";
             
@@ -278,6 +258,7 @@ public class MainActivity extends SherlockFragmentActivity {
             activity.checkUserRetrieved();
         }
         
+        @Override
         protected void onCancelled() {
             final String TAG = "RetrieveUserTask.onCancelled()";
             
@@ -295,6 +276,7 @@ public class MainActivity extends SherlockFragmentActivity {
             progressDialog = new ProgressDialog(activity);
             progressDialog.setMessage(getString(R.string.gettingUser));
             progressDialog.setOnCancelListener(new OnCancelListener() {
+                @Override
                 public void onCancel(DialogInterface dialog) {
                     RetrieveUserTask.this.cancel(false);
                 }
