@@ -5,6 +5,9 @@
     <item android:id="@+id/menu_edit_user"
         android:title="@string/Edit" />
     
+    <item android:id="@+id/menu_user_friends"
+        android:title="@string/Friends" />
+    
      <item android:id="@+id/menu_about_myself"
         android:title="@string/About" />
      

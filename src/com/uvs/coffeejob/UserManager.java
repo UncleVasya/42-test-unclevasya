@@ -8,6 +8,7 @@ import android.util.Log;
 
 public class UserManager implements InterruptListener {
 	private User mUser;
+	private List<User> mUserFriends;
 	private Context mContext;
 	private DBManager mDatabase;
 	private FacebookManager mFacebookManager;
@@ -24,6 +25,7 @@ public class UserManager implements InterruptListener {
 		mFacebookManager = new FacebookManager();
 		mInterrupted = false;
 		mUser = null;
+		mUserFriends = null;
 	}
 	
 	public static UserManager getInstance() {
@@ -37,6 +39,16 @@ public class UserManager implements InterruptListener {
 	        mTaskExecutors.remove(taskExecutor);
 	    }
 	}
+	
+	public void setInterrupted(boolean interrupted) {
+        if (interrupted) {
+            interrupt();
+        }
+        else {
+            mInterrupted = false;
+            mFacebookManager = new FacebookManager();
+        }
+    }
 	
 	public boolean isInterrupted() {
         return mInterrupted;
@@ -74,13 +86,30 @@ public class UserManager implements InterruptListener {
 	            
 	            updateDB();
 	        }
+	        if (isInterrupted()) {
+	            Log.i(TAG, "Task is interrupted");
+	            return null;
+	        }
 	    }
-	    if (isInterrupted()) {
+		return mUser;
+	}
+	
+   public List<User> getUserFriends() {
+        final String TAG = "UserManager.GetUserFriends()"; 
+        if (mUserFriends == null) {
+            Log.i(TAG, "No friends in memory; download from Facebook");
+            mTaskExecutors.add(mFacebookManager);
+            mUserFriends = mFacebookManager.getUserFriends();
+            if (mTaskExecutors.isEmpty() != true) {
+                mTaskExecutors.remove(mTaskExecutors.size()-1);
+            }
+        }
+        if (isInterrupted()) {
             Log.i(TAG, "Task is interrupted");
             return null;
         }
-		return mUser;
-	}
+        return mUserFriends;
+    }
 	
 	public boolean isUserCached() {
 	    return (mUser != null);

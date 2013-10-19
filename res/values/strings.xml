@@ -17,21 +17,22 @@
     <string name="pleaseFindNetworkConnection" translatable="false">No network. Please find working Internet connection to use this application</string>
     <string name="cannotGetUserInfo" translatable="false">Cannot get user info. Must be Network problem</string>
     <string name="tryAgain" translatable="false">Try again</string>
-    <string name="title_activity_edit_user">Edit user info</string>
-    <string name="action_settings">Settings</string>
-    <string name="mySurname_caption">My surname:</string>
-    <string name="selectDate_caption">Select date</string>
-    <string name="addContact_caption">Add contact</string>
-    <string name="save">Save</string>
-    <string name="Delete">Delete</string>
-    <string name="Cancel">Cancel</string>
-    <string name="Edit">Edit</string>
-    <string name="About">About</string>
-    <string name="msgTooOld">You can not be so old!</string>
-    <string name="msgTooYoung">I bet you was born earlier!</string>
-    <string name="msgNoBio">What is about you biography?</string>
-    <string name="msgNoSurname">I am curious of your surname</string>
-    <string name="msgNoName">Please tell me your name</string>
-    <string name="aboutMyself">About myself:</string>
-    <string name="uvsBio">Born in 1991, live in Ukraine. That is all I know.</string>
+    <string name="title_activity_edit_user" translatable="false">Edit user info</string>
+    <string name="action_settings" translatable="false">Settings</string>
+    <string name="mySurname_caption" translatable="false">My surname:</string>
+    <string name="selectDate_caption" translatable="false">Select date</string>
+    <string name="addContact_caption" translatable="false">Add contact</string>
+    <string name="save" translatable="false">Save</string>
+    <string name="Delete" translatable="false">Delete</string>
+    <string name="Cancel" translatable="false">Cancel</string>
+    <string name="Edit" translatable="false">Edit</string>
+    <string name="Friends" translatable="false">Friends</string>
+    <string name="About" translatable="false">About</string>
+    <string name="msgTooOld" translatable="false">You can not be so old!</string>
+    <string name="msgTooYoung" translatable="false">I bet you was born earlier!</string>
+    <string name="msgNoBio" translatable="false">What is about you biography?</string>
+    <string name="msgNoSurname" translatable="false">I am curious of your surname</string>
+    <string name="msgNoName" translatable="false">Please tell me your name</string>
+    <string name="aboutMyself" translatable="false">About myself:</string>
+    <string name="uvsBio" translatable="false">Born in 1991, live in Ukraine. That is all I know.</string>
 </resources>

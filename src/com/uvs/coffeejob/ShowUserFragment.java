@@ -59,9 +59,11 @@ public class ShowUserFragment extends SherlockFragment{
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         menu.add(0, R.id.menu_edit_user, 0, R.string.Edit)
-            .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+            .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        menu.add(0, R.id.menu_user_friends, 0, R.string.Friends)
+            .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         menu.add(0, R.id.menu_about_myself, 0, R.string.About)
-            .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+            .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
     }
     
     @Override
@@ -69,23 +71,24 @@ public class ShowUserFragment extends SherlockFragment{
         if (item.getItemId() == android.R.id.home || item.getItemId() == 0) {
             return false;
         }
+        Fragment fragment = null;
+        FragmentTransaction transaction;
         switch (item.getItemId()) {
         case R.id.menu_edit_user:
-            Fragment edFragment = new EditUserFragment();
-            FragmentTransaction transaction = mFrManager.beginTransaction();
-            transaction.replace(R.id.main_frame, edFragment)
-                       .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                       .addToBackStack(null)
-                       .commit();
+            fragment = new EditUserFragment();
+            break;
+        case R.id.menu_user_friends:
+            fragment = new SplashFragment();
             break;
         case R.id.menu_about_myself:
-            Fragment abFragment = new AboutMyselfFragment();
-            FragmentTransaction t = mFrManager.beginTransaction();
-            t.replace(R.id.main_frame, abFragment);
-            t.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-            t.addToBackStack(null);
-            t.commit();
-        } 
+            fragment = new AboutMyselfFragment();
+            break;
+        }
+        transaction = mFrManager.beginTransaction();
+        transaction.replace(R.id.main_frame, fragment)
+                   .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                   .addToBackStack(null)
+                   .commit();
         return true;
     }
     
