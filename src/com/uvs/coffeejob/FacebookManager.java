@@ -1,7 +1,6 @@
 package com.uvs.coffeejob;
 
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -175,11 +174,19 @@ public class FacebookManager implements InterruptListener {
             return null;
         }
         
-        // DELETE AFTER DEBUG!
-        friends = new ArrayList<User>();
+        //friends = getDebugFriends();
+
+        int count = (friends == null? 0: friends.size());
+        Log.i(TAG, "Friends found: " + count);
+        Log.i(TAG, "Leaving function");
+        return friends;
+    }
+    
+    private List<User> getDebugFriends() {
+        List<User> friends = new ArrayList<User>();
         for (int i=0; i < 1000; ++i) {
             if (isInterrupted()) {
-                Log.i(TAG, "Task is interrupted");
+                Log.i("getDebugFriends()", "Task is interrupted");
                 return null;
             }
             User friend = new User();
@@ -189,10 +196,6 @@ public class FacebookManager implements InterruptListener {
             friend.setId(String.valueOf(i+1));
             friends.add(friend);
         }
-
-        int count = (friends == null? 0: friends.size());
-        Log.i(TAG, "Friends found: " + count);
-        Log.i(TAG, "Leaving function");
         return friends;
     }
     

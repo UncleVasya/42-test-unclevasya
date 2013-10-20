@@ -70,7 +70,8 @@
                 android:layout_weight="1"
                 android:ems="10"
                 android:focusable="false"
-                android:focusableInTouchMode="false" />
+                android:focusableInTouchMode="false"
+                android:inputType="none" />
 
             <Button
                 android:id="@+id/select_date_button"
