@@ -186,6 +186,7 @@ public class FacebookManager implements InterruptListener {
             friend.setName("Agent");
             friend.setSurname("Smith " + (i+1));
             friend.setPhoto(UserManager.getInstance().getUser().getPhoto());
+            friend.setId(String.valueOf(i+1));
             friends.add(friend);
         }
 

@@ -19,6 +19,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -79,11 +80,6 @@ public class FriendsFragment extends SherlockFragment {
     };
     
     @Override
-    public void onStart() {
-        super.onStart();
-    }
-    
-    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         menu.add(0, R.id.menu_show_user, 0, R.string.User)
             .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
@@ -98,27 +94,38 @@ public class FriendsFragment extends SherlockFragment {
         }
         Fragment fragment = null;
         FragmentTransaction transaction;
+        FragmentManager frManager = getActivity().getSupportFragmentManager();
         switch (item.getItemId()) {
         case R.id.menu_show_user:
+            // clear back stack
+            frManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            
             fragment = new ShowUserFragment();
+            transaction = getActivity().getSupportFragmentManager().beginTransaction();
+            transaction.replace(R.id.main_frame, fragment)
+                       .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                       .commit();
             break;
         case R.id.menu_about_myself:
+            // remove this screen from stack
+            frManager.popBackStack();
+            
             fragment = new AboutMyselfFragment();
+            transaction = getActivity().getSupportFragmentManager().beginTransaction();
+            transaction.replace(R.id.main_frame, fragment)
+                       .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                       .addToBackStack(null)
+                       .commit();
             break;
         }
-        getActivity().getSupportFragmentManager().popBackStack();
-        transaction = getActivity().getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.main_frame, fragment)
-                   .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                   .addToBackStack(null)
-                   .commit();
+        
         return true;
     }
     
     private void showFriends() {
         mFriendsCount.setText(String.valueOf(mFriends.size()));
-        FriendsAdapter adapter = new FriendsAdapter(getActivity(), mFriends);
-        mFriendsList.setAdapter(adapter);
+        mAdapter = new FriendsAdapter(getActivity(), mFriends);
+        mFriendsList.setAdapter(mAdapter);
     }
     
     private class FriendsAdapter extends ArrayAdapter<User> {
