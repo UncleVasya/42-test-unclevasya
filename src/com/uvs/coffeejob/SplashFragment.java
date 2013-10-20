@@ -3,17 +3,15 @@ package com.uvs.coffeejob;
 import java.util.List;
 
 import com.actionbarsherlock.app.SherlockFragment;
-import android.app.ProgressDialog;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnCancelListener;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.Toast;
 
 public class SplashFragment extends SherlockFragment {
     private UserManager mUserManager = UserManager.getInstance();
@@ -64,7 +62,22 @@ public class SplashFragment extends SherlockFragment {
         
         @Override
         protected void onPostExecute(List<User> friends) {
-            //getActivity().getSupportFragmentManager().popBackStack();
+            getActivity().getSupportFragmentManager().popBackStack();
+            
+            if (friends != null) {
+                Fragment fragment = new FriendsFragment();
+                FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                transaction.replace(R.id.main_frame, fragment)
+                           .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                           .addToBackStack(null)
+                           .commit();
+            }
+            else {
+                Log.i("SplashScreen", "No connection");
+                Toast.makeText(getActivity(), R.string.pleaseFindNetworkConnection, 
+                               Toast.LENGTH_LONG)
+                     .show();
+            }
         }
         
         @Override

@@ -94,7 +94,7 @@ public class UserManager implements InterruptListener {
 		return mUser;
 	}
 	
-   public List<User> getUserFriends() {
+    public List<User> getUserFriends() {
         final String TAG = "UserManager.GetUserFriends()"; 
         if (mUserFriends == null) {
             Log.i(TAG, "No friends in memory; download from Facebook");
@@ -103,16 +103,20 @@ public class UserManager implements InterruptListener {
             if (mTaskExecutors.isEmpty() != true) {
                 mTaskExecutors.remove(mTaskExecutors.size()-1);
             }
-        }
-        if (isInterrupted()) {
-            Log.i(TAG, "Task is interrupted");
-            return null;
+            if (isInterrupted()) {
+                Log.i(TAG, "Task is interrupted");
+                return null;
+            }
         }
         return mUserFriends;
     }
 	
 	public boolean isUserCached() {
 	    return (mUser != null);
+	}
+	
+	public boolean isFriendsDataCashed() {
+	    return (mUserFriends != null);
 	}
 	
 	private User getUserFromDB() {

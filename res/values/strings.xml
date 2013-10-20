@@ -26,6 +26,7 @@
     <string name="Delete" translatable="false">Delete</string>
     <string name="Cancel" translatable="false">Cancel</string>
     <string name="Edit" translatable="false">Edit</string>
+    <string name="User" translatable="false">User</string>
     <string name="Friends" translatable="false">Friends</string>
     <string name="About" translatable="false">About</string>
     <string name="msgTooOld" translatable="false">You can not be so old!</string>

@@ -66,11 +66,11 @@ public class MainActivity extends SherlockFragmentActivity {
 	    
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main_activity);
-		//setContentView(R.layout.activity_main);
 		uiHelper      = new UiLifecycleHelper(this, callback);
         uiHelper.onCreate(savedInstanceState);
+        getSupportActionBar().setDisplayShowHomeEnabled(false);
 		
-		Log.i(TAG, Session.getActiveSession().toString()); 
+		Log.i(TAG, Session.getActiveSession().toString());
 		if(savedInstanceState == null) {
 		    // application just launched, start from beginning
 		    mUserManager.init(this);

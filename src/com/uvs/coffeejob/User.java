@@ -12,6 +12,7 @@ public class User {
 	private String mBio;
 	private Bitmap mPhoto;
 	private GregorianCalendar mBirthDate;
+	private String mId;
     private List<UserContact> mContacts;
 	
     public void addContact(UserContact contact) {
@@ -41,7 +42,8 @@ public class User {
                      this.getSurname()   .equals(user.getSurname())   &&
                      this.getBio()       .equals(user.getBio())       &&
                      this.getBirthDate() .equals(user.getBirthDate()) &&
-                     this.getContacts()  .equals(user.getContacts());
+                     this.getContacts()  .equals(user.getContacts())  &&
+                     this.getId()        .equals(user.getId());
         }
             return result;
     }
@@ -75,6 +77,9 @@ public class User {
 	    }
 	}
 	
+	public void setId(String id) {
+	    mId = id;
+	}
 	
 	// getters
 	public String getName() {
@@ -99,5 +104,9 @@ public class User {
 	
 	public List<UserContact> getContacts() {
 		return mContacts;
+	}
+	
+	public String getId() {
+	    return mId;
 	}
 }

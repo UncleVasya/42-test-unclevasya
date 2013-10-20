@@ -1,6 +1,7 @@
 package com.uvs.coffeejob;
 
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -29,6 +30,10 @@ public class FacebookManager implements InterruptListener {
         return mInterrupted;
     }
     
+    public static String userIdToURL(String id) {
+        return "https://www.facebook.com/" + id;
+    }
+    
     // makes a request only if session is already open;
     // otherwise return null
     public User getUser() {
@@ -54,6 +59,7 @@ public class FacebookManager implements InterruptListener {
                 user.setName(graphUser.getFirstName());
                 user.setSurname(graphUser.getLastName());
                 user.setBio((String) graphUser.getProperty("bio"));
+                user.setId(graphUser.getId());
                 
                 if (isInterrupted()) {
                     Log.i(TAG, "Task is interrupted");
@@ -63,7 +69,7 @@ public class FacebookManager implements InterruptListener {
                 Bitmap photo = null;
                 try {
                     URL bitmapURL = new URL("https://graph.facebook.com/" + 
-                                            graphUser.getId() + "/picture?" +
+                                            user.getId() + "/picture?" +
                                             "width=" + 128 + "&height=" + 128
                     );
                     InputStream stream = bitmapURL.openConnection().getInputStream();
@@ -141,6 +147,7 @@ public class FacebookManager implements InterruptListener {
                 User friend = new User();
                 friend.setName(graphFriend.getFirstName());
                 friend.setSurname(graphFriend.getLastName());
+                friend.setId(graphFriend.getId());
                 
                 if (isInterrupted()) {
                     Log.i(TAG, "Task is interrupted");
@@ -151,7 +158,7 @@ public class FacebookManager implements InterruptListener {
                 Bitmap photo = null;
                 try {
                     URL bitmapURL = new URL("https://graph.facebook.com/" + 
-                                            graphFriend.getId() + "/picture?" +
+                                            friend.getId() + "/picture?" +
                                             "width=" + 128 + "&height=" + 128
                     );
                     InputStream stream = bitmapURL.openConnection().getInputStream();
@@ -176,16 +183,10 @@ public class FacebookManager implements InterruptListener {
                 return null;
             }
             User friend = new User();
-            friend.setName("TestName");
-            friend.setSurname("TestPhoto");
+            friend.setName("Agent");
+            friend.setSurname("Smith " + (i+1));
             friend.setPhoto(UserManager.getInstance().getUser().getPhoto());
             friends.add(friend);
-            try {
-                Thread.sleep(5);
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
         }
 
         int count = (friends == null? 0: friends.size());

@@ -48,7 +48,7 @@ public class ShowUserFragment extends SherlockFragment{
         mCloseBtn     = (Button)   view.findViewById(R.id.closeButton);
         mCloseBtn.setOnClickListener(onClickListener);
         
-        mFrManager = getActivity().getSupportFragmentManager();
+        mFrManager = getActivity().getSupportFragmentManager();        
         
         clearUserInfo();
         showUserInfo(mUserManager.getUser());
@@ -78,7 +78,12 @@ public class ShowUserFragment extends SherlockFragment{
             fragment = new EditUserFragment();
             break;
         case R.id.menu_user_friends:
-            fragment = new SplashFragment();
+            if (mUserManager.isFriendsDataCashed()) {
+                fragment = new FriendsFragment();
+            }
+            else {
+                fragment = new SplashFragment();
+            }
             break;
         case R.id.menu_about_myself:
             fragment = new AboutMyselfFragment();
