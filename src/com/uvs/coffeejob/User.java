@@ -38,12 +38,18 @@ public class User {
         boolean result = false;
         if (obj != null) {    
             User user = (User) obj;
-            result = this.getName()      .equals(user.getName())      && 
-                     this.getSurname()   .equals(user.getSurname())   &&
-                     this.getBio()       .equals(user.getBio())       &&
-                     this.getBirthDate() .equals(user.getBirthDate()) &&
-                     this.getContacts()  .equals(user.getContacts())  &&
-                     this.getId()        .equals(user.getId());
+            result = ObjectUtils.bothNullOrEqual(this.getName(),
+                                                 user.getName())        && 
+                     ObjectUtils.bothNullOrEqual(this.getSurname(),
+                                                 user.getSurname())     &&
+                     ObjectUtils.bothNullOrEqual(this.getBio(),
+                                                 user.getBio())         &&
+                     ObjectUtils.bothNullOrEqual(this.getBirthDate(),
+                                                 user.getBirthDate())   &&
+                     ObjectUtils.bothNullOrEqual(this.getContacts(),
+                                                 user.getContacts())    &&
+                     ObjectUtils.bothNullOrEqual(this.getId(),
+                                                 user.getId());
         }
             return result;
     }

@@ -182,7 +182,7 @@ public class FacebookManager implements InterruptListener {
         return friends;
     }
     
-    private List<User> getDebugFriends() {
+    public List<User> getDebugFriends() {
         List<User> friends = new ArrayList<User>();
         for (int i=0; i < 1000; ++i) {
             if (isInterrupted()) {

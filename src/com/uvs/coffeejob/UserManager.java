@@ -60,6 +60,10 @@ public class UserManager implements InterruptListener {
 		updateDB();
 	}
 	
+	public void setFriends(List<User> friends) {
+	    mUserFriends = friends;
+	}
+	
 	public User getUser() {
 	    final String TAG = "UserManager.GetUser()"; 
 	    if (mUser == null) {
