@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentManager;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.facebook.Session;
 import com.facebook.Session.OpenRequest;
+import com.facebook.SessionLoginBehavior;
 import com.facebook.SessionState;
 import com.facebook.UiLifecycleHelper;
 import android.os.AsyncTask;
@@ -168,6 +169,7 @@ public class MainActivity extends SherlockFragmentActivity {
             session = new Session(this);
             OpenRequest openRequest = new OpenRequest(this);
             openRequest.setPermissions(mPermissions);
+            openRequest.setLoginBehavior(SessionLoginBehavior.SUPPRESS_SSO);
             openRequest.setCallback(callback);
             Session.setActiveSession(session);
             Session.getActiveSession().openForRead(openRequest);
