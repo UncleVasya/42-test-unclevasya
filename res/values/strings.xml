@@ -29,7 +29,7 @@
     <string name="User" translatable="false">User</string>
     <string name="Friends" translatable="false">Friends</string>
     <string name="About" translatable="false">About</string>
-    <string name="friendsCount" translatable="false">Friends count</string>
+    <string name="friendsCount" translatable="false">Friends count: </string>
     <string name="msgTooOld" translatable="false">You can not be so old!</string>
     <string name="msgTooYoung" translatable="false">I bet you was born earlier!</string>
     <string name="msgNoBio" translatable="false">What is about you biography?</string>

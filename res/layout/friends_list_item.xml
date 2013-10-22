@@ -12,7 +12,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:layout_marginTop="5dp"
-        android:src="@drawable/uvs_towel" />
+        android:src="@drawable/no_avatar" />
 
     <TextView
         android:id="@+id/friendNameText"

@@ -175,7 +175,9 @@ public class FriendsFragment extends SherlockFragment {
             }
 
             User user = getItem(position);
-            holder.photo.setImageBitmap(user.getPhoto());
+            if (user.getPhoto() != null) {
+                holder.photo.setImageBitmap(user.getPhoto());
+            }
             String name = user.getName();
             if (user.getSurname() != null) {
                 name = name + " " + user.getSurname();
