@@ -1,6 +1,7 @@
 package com.uvs.coffeejob;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -13,6 +14,7 @@ public class User {
 	private Bitmap mPhoto;
 	private GregorianCalendar mBirthDate;
 	private String mId;
+	private int mPriority;
     private List<UserContact> mContacts;
 	
     public void addContact(UserContact contact) {
@@ -87,6 +89,10 @@ public class User {
 	    mId = id;
 	}
 	
+	public void setPriority(int priority) {
+	    mPriority = priority;
+	}
+	
 	// getters
 	public String getName() {
 		return mName;
@@ -115,4 +121,15 @@ public class User {
 	public String getId() {
 	    return mId;
 	}
+	
+	public int getPriority() {
+	    return mPriority;
+	}
+	
+	// comparators 
+	public static class PriorityComparator implements Comparator<User> {
+        public int compare(User a, User b) {
+            return b.getPriority() - a.getPriority();
+        }
+    }
 }

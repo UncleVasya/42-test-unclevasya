@@ -16,10 +16,12 @@ public class TestData {
     private static final Activity activity = new Activity();
     
     // DEFAULT USER
-    public static final String DEFAULT_NAME    = "Oleg";
-    public static final String DEFAULT_SURNAME = "Ovcharenko";
-    public static final String DEFAULT_BIO     = "Nothing interesting here. " + 
-                                                 "Just a man from Belogorsk.";
+    public static final String DEFAULT_NAME     = "Oleg";
+    public static final String DEFAULT_SURNAME  = "Ovcharenko";
+    public static final String DEFAULT_ID       = "10";
+    public static final int    DEFAULT_PRIORITY = 1;
+    public static final String DEFAULT_BIO      = "Nothing interesting here. " + 
+                                                  "Just a man from Belogorsk.";
     
     public static final GregorianCalendar DEFAULT_BIRTH = 
             new GregorianCalendar(1991, 00, 01);
@@ -51,6 +53,8 @@ public class TestData {
         user.setSurname     (DEFAULT_SURNAME);
         user.setBio         (DEFAULT_BIO);
         user.setBirthDate   (DEFAULT_BIRTH);
+        user.setId          (DEFAULT_ID);
+        user.setPriority    (DEFAULT_PRIORITY);
         
         for (UserContact contact: DEFAULT_CONTACTS) {
             user.addContact(contact);

@@ -1,5 +1,7 @@
 package com.uvs.coffeejob;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import com.actionbarsherlock.app.SherlockFragment;
@@ -137,6 +139,7 @@ public class FriendsFragment extends SherlockFragment {
 
         public FriendsAdapter(Context context, List<User> friends) {
             super(context, R.layout.friends_list_item, friends);
+            Collections.sort(mFriends, new User.PriorityComparator());
             mInflater = (LayoutInflater) context.getSystemService(
                         Context.LAYOUT_INFLATER_SERVICE);
             

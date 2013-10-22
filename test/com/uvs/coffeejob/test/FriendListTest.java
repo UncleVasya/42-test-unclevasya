@@ -1,6 +1,7 @@
 package com.uvs.coffeejob.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -10,6 +11,7 @@ import org.robolectric.RobolectricTestRunner;
 
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.FragmentManager;
+import android.widget.Adapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -18,6 +20,7 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.uvs.coffeejob.FacebookManager;
 import com.uvs.coffeejob.FriendsFragment;
 import com.uvs.coffeejob.R;
+import com.uvs.coffeejob.User;
 import com.uvs.coffeejob.UserManager;
 
 @RunWith (RobolectricTestRunner.class)
@@ -56,5 +59,15 @@ public class FriendListTest {
         assertEquals(expected_count, 
                      Integer.parseInt(mFriendsCount.getText().toString()));
         assertEquals(expected_count, mListView.getCount());
+    }
+    
+    @Test
+    public void test_friendListSorted() {
+        Adapter adapter = mListView.getAdapter(); 
+        for (int i=1; i < adapter.getCount(); ++i) {
+            User current  = (User) adapter.getItem(i);
+            User previous = (User) adapter.getItem(i-1);
+            assertTrue(current.getPriority() <= previous.getPriority());
+        }
     }
 }

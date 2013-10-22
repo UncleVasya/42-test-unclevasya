@@ -20,11 +20,15 @@ public class UserTest {
         user.setBio(TestData.DEFAULT_BIO);
         user.setBirthDate(TestData.DEFAULT_BIRTH);
         user.setPhoto(TestData.DEFAULT_PHOTO);
+        user.setId(TestData.DEFAULT_ID);
+        user.setPriority(TestData.DEFAULT_PRIORITY);
         assertEquals(TestData.DEFAULT_NAME, user.getName());
         assertEquals(TestData.DEFAULT_SURNAME, user.getSurname());
         assertEquals(TestData.DEFAULT_BIO, user.getBio());
         assertEquals(TestData.DEFAULT_BIRTH, user.getBirthDate());
         assertEquals(TestData.DEFAULT_PHOTO, user.getPhoto());
+        assertEquals(TestData.DEFAULT_ID, user.getId());
+        assertEquals(TestData.DEFAULT_PRIORITY, user.getPriority());
     }
 	
 	@Test
