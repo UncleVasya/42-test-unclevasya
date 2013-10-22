@@ -64,19 +64,7 @@ public class FacebookManager implements InterruptListener {
                     Log.i(TAG, "Task is interrupted");
                     return null;
                 }
-                // photo
-                Bitmap photo = null;
-                try {
-                    URL bitmapURL = new URL("https://graph.facebook.com/" + 
-                                            user.getId() + "/picture?" +
-                                            "width=" + 128 + "&height=" + 128
-                    );
-                    InputStream stream = bitmapURL.openConnection().getInputStream();
-                    photo = BitmapFactory.decodeStream(stream);
-                } catch (Exception e) {
-                    photo = null;
-                }
-                user.setPhoto(photo);
+               user.setPhoto(getUserPhoto(user));
                
                 // birth date
                 GregorianCalendar birth;
@@ -135,37 +123,24 @@ public class FacebookManager implements InterruptListener {
             
             // parse response
             GraphMultiResult result = response.getGraphObjectAs(GraphMultiResult.class);
+            Log.i(TAG, "result: " + result);
             if (result == null) {
                 return null;
             }
             List<GraphUser> graphFriends = result.getData().castToListOf(GraphUser.class);
+            Log.i(TAG, "graphFriends count: " + graphFriends.size());
             
             // parse Facebook graph
             friends = new ArrayList<User>();
             for (GraphUser graphFriend: graphFriends) {
                 User friend = new User();
-                friend.setName(graphFriend.getFirstName());
-                friend.setSurname(graphFriend.getLastName());
-                friend.setId(graphFriend.getId());
-                
-                if (isInterrupted()) {
-                    Log.i(TAG, "Task is interrupted");
-                    return null;
-                }
-                
-                // photo
-                Bitmap photo = null;
-                try {
-                    URL bitmapURL = new URL("https://graph.facebook.com/" + 
-                                            friend.getId() + "/picture?" +
-                                            "width=" + 128 + "&height=" + 128
-                    );
-                    InputStream stream = bitmapURL.openConnection().getInputStream();
-                    photo = BitmapFactory.decodeStream(stream);
-                } catch (Exception e) {
-                    photo = null;
-                }
-                friend.setPhoto(photo);
+                String[] full_name = graphFriend.getName().split(" ");
+                friend.setName(full_name[0]);
+                if (full_name.length > 1) { // we have surname too
+                    friend.setSurname(full_name[full_name.length-1]);
+                } 
+                friend.setId(graphFriend.getId());    
+                friends.add(friend);
             }
         }
         
@@ -197,6 +172,22 @@ public class FacebookManager implements InterruptListener {
             friends.add(friend);
         }
         return friends;
+    }
+    
+    public Bitmap getUserPhoto(User user) {
+        Bitmap photo = null;
+        try {
+            URL bitmapURL = new URL("https://graph.facebook.com/" + 
+                                    user.getId() + "/picture?" +
+                                    "width=" + 70 + "&height=" + 70
+            );
+            InputStream stream = bitmapURL.openConnection().getInputStream();
+            photo = BitmapFactory.decodeStream(stream);
+        } 
+        catch (Exception e) {
+            photo = null;
+        }
+        return photo;
     }
     
 }

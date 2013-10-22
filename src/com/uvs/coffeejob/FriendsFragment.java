@@ -10,6 +10,7 @@ import com.actionbarsherlock.view.MenuItem;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -41,10 +42,20 @@ public class FriendsFragment extends SherlockFragment {
         mFriendsList = (ListView) view.findViewById(R.id.friendsList);
         mFriendsList.setOnItemClickListener(mOnItemClickListener);
         mFriendsCount = (TextView)view.findViewById(R.id.friendsCountText);
-
-        showFriends();
         
         return view;
+    }
+    
+    @Override
+    public void onStart() {
+        super.onStart();
+        showFriends();
+    }
+    
+    @Override
+    public void onPause() {
+        super.onPause();
+        mAdapter.mGetPhotoTask.cancel(false);
     }
     
     private OnItemClickListener mOnItemClickListener = new OnItemClickListener() {
@@ -120,12 +131,17 @@ public class FriendsFragment extends SherlockFragment {
     private class FriendsAdapter extends ArrayAdapter<User> {
         private List<User> mFriends;
         private LayoutInflater mInflater;
+        
+        private FacebookManager mFBManager = new FacebookManager();
+        public GetPhotoTask mGetPhotoTask = new GetPhotoTask();
 
         public FriendsAdapter(Context context, List<User> friends) {
             super(context, R.layout.friends_list_item, friends);
-            mFriends = friends;
             mInflater = (LayoutInflater) context.getSystemService(
                         Context.LAYOUT_INFLATER_SERVICE);
+            
+            mFriends = friends;
+            mGetPhotoTask.execute();
         }
 
         @Override
@@ -160,7 +176,11 @@ public class FriendsFragment extends SherlockFragment {
 
             User user = getItem(position);
             holder.photo.setImageBitmap(user.getPhoto());
-            holder.name .setText(user.getName() + " " + user.getSurname());
+            String name = user.getName();
+            if (user.getSurname() != null) {
+                name = name + " " + user.getSurname();
+            }
+            holder.name .setText(name);
 
             return v;
         }
@@ -168,6 +188,33 @@ public class FriendsFragment extends SherlockFragment {
         private class ViewHolder {
             TextView  name;
             ImageView photo;
-        }   
+        }
+        
+        private class GetPhotoTask extends AsyncTask<Void, Void, User> {
+            @Override
+            protected User doInBackground(Void... params) {
+                for (User friend: mFriends) {
+                    if (isCancelled()) {
+                        break;
+                    }
+                    if (friend.getPhoto() != null) {
+                        continue;
+                    }
+                    // download photo
+                    friend.setPhoto(mFBManager.getUserPhoto(friend));
+                    // update ListView
+                    if (getActivity() != null) {
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                FriendsAdapter.this.notifyDataSetChanged();
+                            }
+                        });
+                    }
+                }
+                return null;
+            }
+            
+        }
     }
 }
