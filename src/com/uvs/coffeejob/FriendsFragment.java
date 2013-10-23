@@ -11,6 +11,8 @@ import com.actionbarsherlock.view.MenuItem;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -186,6 +188,11 @@ public class FriendsFragment extends SherlockFragment {
             User user = getItem(position);
             if (user.getPhoto() != null) {
                 holder.photo.setImageBitmap(user.getPhoto());
+            }
+            else {
+                Bitmap photo = BitmapFactory.decodeResource(
+                        getResources(), R.drawable.no_avatar);
+                holder.photo.setImageBitmap(photo);
             }
             String name = user.getName();
             if (user.getSurname() != null) {
