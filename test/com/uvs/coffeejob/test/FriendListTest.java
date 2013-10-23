@@ -1,24 +1,24 @@
 package com.uvs.coffeejob.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
-
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.FragmentManager;
+import android.view.View;
 import android.widget.Adapter;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
-
-import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.uvs.coffeejob.FacebookManager;
 import com.uvs.coffeejob.FriendsFragment;
+import com.uvs.coffeejob.FriendsFragment.FriendsAdapter.ViewHolder;
 import com.uvs.coffeejob.R;
 import com.uvs.coffeejob.User;
 import com.uvs.coffeejob.UserManager;
@@ -63,11 +63,27 @@ public class FriendListTest {
     
     @Test
     public void test_friendListSorted() {
-        Adapter adapter = mListView.getAdapter(); 
+        Adapter adapter = mListView.getAdapter();
         for (int i=1; i < adapter.getCount(); ++i) {
             User current  = (User) adapter.getItem(i);
             User previous = (User) adapter.getItem(i-1);
             assertTrue(current.getPriority() <= previous.getPriority());
         }
+    }
+    
+    @Test
+    public void test_userChangesPriority() {
+        Adapter adapter = mListView.getAdapter();
+        
+        User oldFirstFriend = (User) adapter.getItem(0);
+        
+        View v = adapter.getView(0, null, null);
+        Spinner prioritySpinner = ((ViewHolder) v.getTag()).priority;
+        prioritySpinner.getOnItemSelectedListener()
+                       .onItemSelected(prioritySpinner, null, 3, 0);
+        
+        User newFirstFriend = (User) adapter.getItem(0);
+        
+        assertFalse(oldFirstFriend.getId().equals(newFirstFriend.getId()));
     }
 }
