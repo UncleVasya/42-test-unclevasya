@@ -134,7 +134,6 @@ public class FriendsFragment extends SherlockFragment {
     }
     
     private class FriendsAdapter extends ArrayAdapter<User> {
-        private List<User> mFriends;
         private LayoutInflater mInflater;
         
         private FacebookManager mFBManager = new FacebookManager();
