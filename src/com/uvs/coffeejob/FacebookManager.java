@@ -159,7 +159,7 @@ public class FacebookManager implements InterruptListener {
     
     public List<User> getDebugFriends() {
         List<User> friends = new ArrayList<User>();
-        for (int i=0; i < 100; ++i) {
+        for (int i=0; i < 5; ++i) {
             if (isInterrupted()) {
                 Log.i("getDebugFriends()", "Task is interrupted");
                 return null;
@@ -169,7 +169,7 @@ public class FacebookManager implements InterruptListener {
             friend.setSurname("Smith " + (i+1));
             friend.setPhoto(UserManager.getInstance().getUser().getPhoto());
             friend.setId(String.valueOf(i+1));
-            friend.setPriority((i+1)%10);
+            friend.setPriority(i%5+1);
             friends.add(friend);
         }
         return friends;

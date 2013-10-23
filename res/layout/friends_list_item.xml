@@ -14,17 +14,45 @@
         android:layout_marginTop="5dp"
         android:src="@drawable/no_avatar" />
 
-    <TextView
-        android:id="@+id/friendNameText"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/friendPhotoImage"
-        android:layout_alignParentRight="false"
-        android:layout_alignParentTop="false"
         android:layout_centerVertical="true"
         android:layout_marginLeft="20dp"
         android:layout_toRightOf="@+id/friendPhotoImage"
-        android:layout_weight="1"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/friendNameText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:layout_weight="1"
+            android:gravity="right" >
+
+            <TextView
+                android:id="@+id/textView1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="Priority:" />
+
+            <Spinner
+                android:id="@+id/priorityList"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:entries="@array/priority"
+                android:paddingBottom="0dp"
+                android:paddingTop="0dp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
 
 </RelativeLayout>

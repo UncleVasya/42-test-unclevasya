@@ -17,14 +17,17 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 public class FriendsFragment extends SherlockFragment {
@@ -165,14 +168,18 @@ public class FriendsFragment extends SherlockFragment {
         @Override
         public View getView(int position, View v, ViewGroup parent) {
             ViewHolder holder;
+            
+            Log.i("getView()", "Entering function");
 
             if (v == null) {
                 v = mInflater.inflate(R.layout.friends_list_item, parent, false);
                 holder = new ViewHolder();
-                holder.photo = (ImageView) v.findViewById(R.id.friendPhotoImage);
-                holder.name  = (TextView)  v.findViewById(R.id.friendNameText);
+                holder.photo    = (ImageView) v.findViewById(R.id.friendPhotoImage);
+                holder.name     = (TextView)  v.findViewById(R.id.friendNameText);
+                holder.priority = (Spinner)   v.findViewById(R.id.priorityList);
+                
                 v.setTag(holder);
-            } 
+            }
             else {
                 holder = (ViewHolder) v.getTag();
             }
@@ -186,6 +193,11 @@ public class FriendsFragment extends SherlockFragment {
                 name = name + " " + user.getSurname();
             }
             holder.name .setText(name);
+            
+            Spinner priority = holder.priority;
+            priority.setId(position);
+            priority.setSelection(priority.getCount() - user.getPriority());
+            priority.setOnItemSelectedListener(onPrioritySelected);        
 
             return v;
         }
@@ -193,7 +205,32 @@ public class FriendsFragment extends SherlockFragment {
         private class ViewHolder {
             TextView  name;
             ImageView photo;
+            Spinner   priority;
         }
+        
+        OnItemSelectedListener onPrioritySelected = new OnItemSelectedListener() {
+            boolean initialized = false;
+            
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                       int position, long id) 
+            {           
+                int priority = parent.getCount() - position;
+                User friend = mAdapter.getItem(parent.getId());
+                Log.i("onPrioritySelected()", 
+                        "user position: " + parent.getId() + "\n" +
+                        "old priority: " + friend.getPriority() + "\n" +
+                        "new priority: " + priority);
+                if (friend.getPriority() != priority) {
+                    friend.setPriority(priority);
+                    Collections.sort(mFriends, new User.PriorityComparator());
+                    mAdapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> arg0) {}
+        };
         
         private class GetPhotoTask extends AsyncTask<Void, Void, User> {
             @Override
@@ -219,7 +256,6 @@ public class FriendsFragment extends SherlockFragment {
                 }
                 return null;
             }
-            
         }
     }
 }

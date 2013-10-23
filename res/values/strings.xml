@@ -37,4 +37,13 @@
     <string name="msgNoName" translatable="false">Please tell me your name</string>
     <string name="aboutMyself" translatable="false">About myself:</string>
     <string name="uvsBio" translatable="false">Born in 1991, live in Ukraine. That is all I know.</string>
+    
+    <string-array name="priority">
+    <item>5</item>
+    <item>4</item>
+    <item>3</item>
+    <item>2</item>
+    <item>1</item>
+</string-array>
+
 </resources>

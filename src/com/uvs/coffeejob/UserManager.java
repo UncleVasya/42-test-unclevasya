@@ -103,7 +103,7 @@ public class UserManager implements InterruptListener {
         if (mUserFriends == null) {
             Log.i(TAG, "No friends in memory; download from Facebook");
             mTaskExecutors.add(mFacebookManager);
-            mUserFriends = mFacebookManager.getUserFriends();
+            mUserFriends = mFacebookManager.getDebugFriends();
             if (mTaskExecutors.isEmpty() != true) {
                 mTaskExecutors.remove(mTaskExecutors.size()-1);
             }
