@@ -88,5 +88,4 @@ public class SplashFragment extends SherlockFragment {
             taskExecutor.interrupt();
         }
     }
-
 }

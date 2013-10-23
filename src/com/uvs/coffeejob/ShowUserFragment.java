@@ -181,5 +181,4 @@ public class ShowUserFragment extends SherlockFragment{
         mUserPhoto.setImageBitmap(null);
         mUserContacts.setText(null);
     }
-
 }

@@ -428,6 +428,5 @@ public class MainActivity extends SherlockFragmentActivity {
             Log.i(TAG, "NullPonterException  " + 
                        "SHOULD HAPPEN ONLY UNDER ROBOLECTRIC");
         }
-        
     }
 }

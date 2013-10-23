@@ -6,5 +6,4 @@ public class ObjectUtils {
         return a == null && b == null || 
                a != null && b != null && a.equals(b);
     }
-
 }
