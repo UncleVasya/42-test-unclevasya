@@ -19,7 +19,7 @@ import android.util.Log;
 
 public class DBManager extends SQLiteOpenHelper {
     private static final String DATABASE_NAME       = R.string.app_name + ".db";
-    private static final int    DATABASE_VERSION    = 1;
+    private static final int    DATABASE_VERSION    = 2;
 
     // ------------------- USERS table------------------------
     private static final String USERS             = "Users";
