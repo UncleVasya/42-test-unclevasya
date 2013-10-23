@@ -130,6 +130,8 @@ public class FacebookManager implements InterruptListener {
             List<GraphUser> graphFriends = result.getData().castToListOf(GraphUser.class);
             Log.i(TAG, "graphFriends count: " + graphFriends.size());
             
+            UserManager userManager = UserManager.getInstance();
+            
             // parse Facebook graph
             friends = new ArrayList<User>();
             for (GraphUser graphFriend: graphFriends) {
@@ -139,7 +141,15 @@ public class FacebookManager implements InterruptListener {
                 if (full_name.length > 1) { // we have surname too
                     friend.setSurname(full_name[full_name.length-1]);
                 } 
-                friend.setId(graphFriend.getId());    
+                friend.setId(graphFriend.getId());
+                // get priority from DB or set default one
+                User fromDB = userManager.getFriendFromDB(friend.getId()) ;
+                if (fromDB != null && fromDB.getPriority() != 0) {
+                    friend.setPriority(fromDB.getPriority());
+                }
+                else {
+                    friend.setPriority(User.DEFAULT_PRIORITY);
+                }
                 friends.add(friend);
             }
         }
@@ -149,7 +159,7 @@ public class FacebookManager implements InterruptListener {
             return null;
         }
         
-        friends = getDebugFriends();
+        //friends = getDebugFriends();
 
         int count = (friends == null? 0: friends.size());
         Log.i(TAG, "Friends found: " + count);
@@ -159,7 +169,7 @@ public class FacebookManager implements InterruptListener {
     
     public List<User> getDebugFriends() {
         List<User> friends = new ArrayList<User>();
-        for (int i=0; i < 5; ++i) {
+        for (int i=0; i < 10; ++i) {
             if (isInterrupted()) {
                 Log.i("getDebugFriends()", "Task is interrupted");
                 return null;
@@ -167,7 +177,7 @@ public class FacebookManager implements InterruptListener {
             User friend = new User();
             friend.setName("Agent");
             friend.setSurname("Smith " + (i+1));
-            friend.setPhoto(UserManager.getInstance().getUser().getPhoto());
+            //friend.setPhoto(UserManager.getInstance().getUser().getPhoto());
             friend.setId(String.valueOf(i+1));
             friend.setPriority(i%5+1);
             friends.add(friend);
@@ -190,5 +200,4 @@ public class FacebookManager implements InterruptListener {
         }
         return photo;
     }
-    
 }

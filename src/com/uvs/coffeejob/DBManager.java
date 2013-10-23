@@ -29,6 +29,8 @@ public class DBManager extends SQLiteOpenHelper {
     private static final String USERS_BIO         = "bio";
     private static final String USERS_BIRTHDATE   = "birthdate";
     private static final String USERS_PHOTO       = "userphoto";
+    private static final String USERS_FB_ID       = "fb_id";
+    private static final String USERS_PRIORITY    = "priority";
     
     // ------------------- CONTACTS table------------------------
     private static final String CONTACTS          = "Contacts";
@@ -51,7 +53,9 @@ public class DBManager extends SQLiteOpenHelper {
                         USERS_SURNAME     + " string, "  + 
                         USERS_BIO         + " string, "  + 
                         USERS_BIRTHDATE   + " integer, " +
-                        USERS_PHOTO       + " blob "	 + ");";
+                        USERS_PHOTO       + " blob, "	 +
+                        USERS_FB_ID       + " string, "   +
+                        USERS_PRIORITY    + " integer " + ");";
         Log.i("DBManager", "onCreate(): \n\n" + sql);
         db.execSQL(sql);
      
@@ -83,6 +87,10 @@ public class DBManager extends SQLiteOpenHelper {
         if (user.getBirthDate() != null) {
             values.put(USERS_BIRTHDATE, user.getBirthDate().getTime().getTime());
         }
+        if (user.getId() != null) {
+            values.put(USERS_FB_ID, user.getId());
+        }
+        values.put(USERS_PRIORITY, user.getPriority());
         
         if (user.getPhoto() != null) {
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -93,6 +101,27 @@ public class DBManager extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
         Long userID = db.insert(USERS, null, values);
         addContacts(user.getContacts(), userID);
+        db.close();
+    }
+    
+    // currently we store only id and priority for friends
+    public void addFriend(User friend) {
+        Log.i("DBManager", "addFriend()");
+        ContentValues values = new ContentValues();
+        
+        if (friend.getName() != null) {
+            values.put(USERS_NAME, friend.getName());
+        }
+        if (friend.getSurname() != null) {
+            values.put(USERS_SURNAME, friend.getSurname());
+        }
+        if (friend.getId() != null) {
+            values.put(USERS_FB_ID, friend.getId());
+        }
+        values.put(USERS_PRIORITY, friend.getPriority());
+
+        SQLiteDatabase db = getWritableDatabase();
+        db.insert(USERS, null, values);
         db.close();
     }
     
@@ -145,6 +174,15 @@ public class DBManager extends SQLiteOpenHelper {
                     byte[] blob = cursor.getBlob(5);
                     Bitmap photo = BitmapFactory.decodeByteArray(blob, 0, blob.length);
                     user.setPhoto(photo);
+                }
+                if (cursor.isNull(6) != true) { // FB id
+                    user.setId(cursor.getString(6));
+                }
+                if (cursor.isNull(7) != true) { // priority
+                    user.setPriority(cursor.getInt(7));
+                }
+                else {
+                    user.setPriority(0);
                 }
                 List<UserContact> contacts = getUserContacts(userID);
                 for (UserContact contact: contacts) { // contacts

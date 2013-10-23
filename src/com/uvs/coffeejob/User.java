@@ -8,6 +8,8 @@ import java.util.List;
 import android.graphics.Bitmap;
 
 public class User {
+    public static int DEFAULT_PRIORITY = 3;
+    
 	private String mName;
 	private String mSurname;
 	private String mBio;

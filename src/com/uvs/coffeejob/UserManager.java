@@ -9,6 +9,7 @@ import android.util.Log;
 public class UserManager implements InterruptListener {
 	private User mUser;
 	private List<User> mUserFriends;
+	private List<User> mFriendsFromDB;
 	private Context mContext;
 	private DBManager mDatabase;
 	private FacebookManager mFacebookManager;
@@ -26,6 +27,7 @@ public class UserManager implements InterruptListener {
 		mInterrupted = false;
 		mUser = null;
 		mUserFriends = null;
+		mFriendsFromDB = null;
 	}
 	
 	public static UserManager getInstance() {
@@ -103,7 +105,7 @@ public class UserManager implements InterruptListener {
         if (mUserFriends == null) {
             Log.i(TAG, "No friends in memory; download from Facebook");
             mTaskExecutors.add(mFacebookManager);
-            mUserFriends = mFacebookManager.getDebugFriends();
+            mUserFriends = mFacebookManager.getUserFriends();
             if (mTaskExecutors.isEmpty() != true) {
                 mTaskExecutors.remove(mTaskExecutors.size()-1);
             }
@@ -132,10 +134,40 @@ public class UserManager implements InterruptListener {
 		return user;
 	}
 	
+	public List<User> getFriendsFromDB() {
+        if (mFriendsFromDB == null) {
+            List<User> usersFromDB = mDatabase.getUsers();
+            if (usersFromDB.isEmpty() != true) {
+                usersFromDB.remove(0);
+                mFriendsFromDB = usersFromDB;
+            }
+        }
+        return mFriendsFromDB;
+    }
+	
+	public User getFriendFromDB(String id) {
+	    User friend = null;
+        if (mFriendsFromDB == null) {
+            getFriendsFromDB();
+        }
+        for (User f: mFriendsFromDB) {
+            if (f.getId().equals(id)) {
+                friend = f;
+                break;
+            }
+        }
+        return friend;
+    }
+	
 	public void updateDB(){
 		mDatabase.clearDB();
 		if (mUser != null) {
 		    mDatabase.addUser(mUser);
+		    if (mUserFriends != null) {
+    		    for (User friend: mUserFriends) {
+    		        mDatabase.addFriend(friend);
+    		    }
+		    }
 		}
 	}
 }

@@ -1,7 +1,6 @@
 package com.uvs.coffeejob;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import com.actionbarsherlock.app.SherlockFragment;
@@ -39,6 +38,8 @@ public class FriendsFragment extends SherlockFragment {
     private List<User> mFriends = UserManager.getInstance().getUserFriends();
     private FriendsAdapter mAdapter;
     
+    private static SavePrioritiesTask mSavePrioritiesTask;
+    
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) 
@@ -49,7 +50,7 @@ public class FriendsFragment extends SherlockFragment {
         mFriendsList = (ListView) view.findViewById(R.id.friendsList);
         mFriendsList.setOnItemClickListener(mOnItemClickListener);
         mFriendsCount = (TextView)view.findViewById(R.id.friendsCountText);
-        
+                
         return view;
     }
     
@@ -61,8 +62,15 @@ public class FriendsFragment extends SherlockFragment {
     
     @Override
     public void onPause() {
+        Log.i("onPause()", "Entering function");
         super.onPause();
         mAdapter.mGetPhotoTask.cancel(false);
+        
+        if (mSavePrioritiesTask == null || mSavePrioritiesTask.isFinished()) {
+            Log.i("onPause()", "Saving priorities to DB");
+            mSavePrioritiesTask = new SavePrioritiesTask();
+            mSavePrioritiesTask.execute();
+        }
     }
     
     private OnItemClickListener mOnItemClickListener = new OnItemClickListener() {
@@ -135,7 +143,7 @@ public class FriendsFragment extends SherlockFragment {
         mFriendsList.setAdapter(mAdapter);
     }
     
-    private class FriendsAdapter extends ArrayAdapter<User> {
+    public class FriendsAdapter extends ArrayAdapter<User> {
         private LayoutInflater mInflater;
         
         private FacebookManager mFBManager = new FacebookManager();
@@ -208,10 +216,10 @@ public class FriendsFragment extends SherlockFragment {
             return v;
         }
 
-        private class ViewHolder {
-            TextView  name;
-            ImageView photo;
-            Spinner   priority;
+        public class ViewHolder {
+            public TextView  name;
+            public ImageView photo;
+            public Spinner   priority;
         }
         
         OnItemSelectedListener onPrioritySelected = new OnItemSelectedListener() {
@@ -262,6 +270,25 @@ public class FriendsFragment extends SherlockFragment {
                 }
                 return null;
             }
+        }
+    }
+    
+    private class SavePrioritiesTask extends AsyncTask<Void, Void, Void> {
+        private boolean finished = false;
+        
+        @Override
+        protected Void doInBackground(Void... params) {
+            UserManager.getInstance().updateDB();
+            return null;
+        }
+        
+        @Override
+        protected void onPostExecute(Void v) {
+            finished = true;
+        }
+        
+        public boolean isFinished() {
+            return finished;
         }
     }
 }
