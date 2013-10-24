@@ -20,7 +20,9 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -145,6 +147,7 @@ public class FriendsFragment extends SherlockFragment {
     
     public class FriendsAdapter extends ArrayAdapter<User> {
         private LayoutInflater mInflater;
+        public User mCurrentFriend;
         
         private FacebookManager mFBManager = new FacebookManager();
         public GetPhotoTask mGetPhotoTask = new GetPhotoTask();
@@ -211,8 +214,13 @@ public class FriendsFragment extends SherlockFragment {
             Spinner priority = holder.priority;
             priority.setId(position);
             priority.setSelection(priority.getCount() - user.getPriority());
-            priority.setOnItemSelectedListener(onPrioritySelected);        
+            priority.setOnItemSelectedListener(onPrioritySelected);
+            priority.setOnTouchListener(mOnTouchListener);
 
+            // HINT: try to extend SpinnerAdapter and override GetExpandedView;
+            // save current Friend there;
+            // later on PrioritySelected use that saved friend.
+            // HINT: try setOntouchlistener
             return v;
         }
 
@@ -222,28 +230,42 @@ public class FriendsFragment extends SherlockFragment {
             public Spinner   priority;
         }
         
-        OnItemSelectedListener onPrioritySelected = new OnItemSelectedListener() {
-            boolean initialized = false;
-            
+        OnTouchListener mOnTouchListener = new OnTouchListener() {
+            @Override
+            public boolean onTouch(View arg0, MotionEvent arg1) {
+                Log.i("onTouch()", "view id: " + arg0.getId());
+                mCurrentFriend = mFriends.get(arg0.getId());
+                return false;
+            }
+        };
+        
+        OnItemSelectedListener onPrioritySelected = new OnItemSelectedListener() {   
             @Override
             public void onItemSelected(AdapterView<?> parent, View view,
                                        int position, long id) 
-            {           
+            {   
+                if (mCurrentFriend == null) {
+                    return; // automatic event, not a real user selection
+                }
+                
                 int priority = parent.getCount() - position;
-                User friend = mAdapter.getItem(parent.getId());
+                User friend = mCurrentFriend;
                 Log.i("onPrioritySelected()", 
                         "user position: " + parent.getId() + "\n" +
-                        "old priority: " + friend.getPriority() + "\n" +
+                        "old priority: " + mCurrentFriend.getPriority() + "\n" +
                         "new priority: " + priority);
-                if (friend.getPriority() != priority) {
-                    friend.setPriority(priority);
+                if (mCurrentFriend.getPriority() != priority) {
+                    mCurrentFriend.setPriority(priority);
                     Collections.sort(mFriends, new User.PriorityComparator());
                     mAdapter.notifyDataSetChanged();
                 }
+                mCurrentFriend = null;
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> arg0) {}
+            public void onNothingSelected(AdapterView<?> arg0) {
+                mCurrentFriend = null;
+            }
         };
         
         private class GetPhotoTask extends AsyncTask<Void, Void, User> {

@@ -18,6 +18,7 @@ import android.widget.TextView;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.uvs.coffeejob.FacebookManager;
 import com.uvs.coffeejob.FriendsFragment;
+import com.uvs.coffeejob.FriendsFragment.FriendsAdapter;
 import com.uvs.coffeejob.FriendsFragment.FriendsAdapter.ViewHolder;
 import com.uvs.coffeejob.R;
 import com.uvs.coffeejob.User;
@@ -73,12 +74,13 @@ public class FriendListTest {
     
     @Test
     public void test_userChangesPriority() {
-        Adapter adapter = mListView.getAdapter();
+        FriendsAdapter adapter = (FriendsAdapter) mListView.getAdapter();
         
         User oldFirstFriend = (User) adapter.getItem(0);
         
         View v = adapter.getView(0, null, null);
         Spinner prioritySpinner = ((ViewHolder) v.getTag()).priority;
+        adapter.mCurrentFriend = mUserManager.getUserFriends().get(0);
         prioritySpinner.getOnItemSelectedListener()
                        .onItemSelected(prioritySpinner, null, 3, 0);
         
